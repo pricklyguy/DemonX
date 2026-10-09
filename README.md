@@ -8,7 +8,7 @@ Browser-based CNC controller by Prickly Guy Creations. One server owns the machi
 
 - **Windows:** download the zip (a release, or the "Windows package" Action), extract it, double-click `Start DemonX.bat`. Guide: [`docs/WINDOWS.md`](docs/WINDOWS.md).
 - **Raspberry Pi:** [`docs/RASPBERRY-PI.md`](docs/RASPBERRY-PI.md).
-- **Linux or macOS:** `npm install && npm run build && npm start`, then open http://localhost:8080.
+- **Linux or macOS:** [`docs/LINUX-MAC.md`](docs/LINUX-MAC.md) (git clone, `npm install`, `npm run build`, `npm start`, then open http://localhost:8080).
 
 ## What it does
 

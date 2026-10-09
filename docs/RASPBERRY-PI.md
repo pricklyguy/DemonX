@@ -26,13 +26,13 @@ ssh YOUR-USER@demonx.local
 
 ## 3. Install DemonX
 ```bash
-git clone https://github.com/pricklyguy/DemonX.git
+git clone https://github.com/pricklyguy/DemonX.git demonx
 cd demonx
 ./scripts/install-pi.sh
 ```
 The script installs Node.js, the packages and the web page, gives your user serial-port access, and sets DemonX to start at every boot. It takes several minutes on a Pi. When it finishes it prints the address. Reboot once when it says so (`sudo reboot`).
 
-To install a specific release instead of the newest code, add its tag: `git clone --branch v2.0.0-test.2 https://github.com/pricklyguy/DemonX.git` (the tags are on the Releases page).
+To install a specific release instead of the newest code, add its tag: `git clone --branch v2.0.0-test.2 https://github.com/pricklyguy/DemonX.git demonx` (the tags are on the Releases page).
 
 If the repository is private, GitHub will ask for credentials: use a personal access token as the password.
 

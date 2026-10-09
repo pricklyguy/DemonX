@@ -41,16 +41,21 @@ Type `simulator` in the port box to try everything with no machine. For a real m
 
 ## Update
 
+Stop DemonX (Ctrl+C in its terminal), then:
+
 ```bash
 cd DemonX
-./scripts/update.sh
+git pull
+npm install
+npm run build
+npm start
 ```
 
-Your settings and PIN live in `data/` and are kept.
+Your settings and PIN live in `data/` and are kept. (If you set up PM2 below, `./scripts/update.sh` does these steps and restarts DemonX for you.)
 
 ## Start automatically
 
-To run DemonX in the background and have it start when the computer boots, follow [Run at boot with PM2](../README.md#run-at-boot-with-pm2-the-mini-pc).
+To run DemonX in the background and have it start when the computer boots, install PM2 (`npm install -g pm2`) and follow [Run at boot with PM2](../README.md#run-at-boot-with-pm2-the-mini-pc).
 
 ## Stuck?
 

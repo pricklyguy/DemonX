@@ -1,0 +1,420 @@
+# DemonX dashboard card for a machine shared through MQTT (Settings > Home Assistant > Home Assistant device).
+# The device name in DemonX decides the entity names: a device called "Cubiko" gives sensor.cubiko_machine_state.
+# If yours is called something else, replace "cubiko" below (Find and Replace in the raw configuration editor).
+# Needs the HACS cards you already use: mod-card (card-mod), mushroom, bar-card.
+type: custom:mod-card
+style:
+  .: |
+    ha-card {
+      {% set s = states('sensor.cubiko_machine_state') %}
+      {% if s == 'Alarm' %}
+        background: linear-gradient(160deg, #660000 0%, #ff0000 100%);
+      {% elif is_state('binary_sensor.cubiko_pcb_mode', 'on') %}
+        background: linear-gradient(160deg, #1d6654 0%, #3ccda9 100%);
+      {% elif s == 'Run' %}
+        background: linear-gradient(160deg, #004d00 0%, #00cc00 100%);
+      {% elif s == 'Idle' %}
+        background: linear-gradient(160deg, #222 0%, #555 100%);
+      {% else %}
+        background: linear-gradient(160deg, #616101 0%, #cccc00 100%);
+      {% endif %}
+      color: #fff;
+      border-radius: 20px;
+      padding: 16px;
+    }
+card:
+  type: vertical-stack
+  cards:
+    - type: custom:mushroom-template-card
+      primary: |
+        🛠️ Cubiko: {{ states('sensor.cubiko_machine_state') }}
+      secondary: >
+        Job: {{ states('sensor.cubiko_job_state') }} · File: {{ states('sensor.cubiko_file_name') }}
+      icon: |
+        {% set s = states('sensor.cubiko_machine_state') %}
+        {% if s == 'Run' %} mdi:play-circle
+        {% elif s == 'Idle' %} mdi:pause-circle
+        {% elif s == 'Alarm' %} mdi:alert-circle
+        {% else %} mdi:help-circle
+        {% endif %}
+      icon_color: |
+        {% set s = states('sensor.cubiko_machine_state') %}
+        {% if s == 'Run' %} green
+        {% elif s == 'Idle' %} yellow
+        {% elif s == 'Alarm' %} red
+        {% else %} grey
+        {% endif %}
+      layout: horizontal
+      fill_container: true
+      multiline_secondary: true
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+            border: 2px solid rgba(255,255,255,0.18) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+            border-radius: 12px;
+          }
+    - type: grid
+      square: false
+      columns: 3
+      cards:
+        - type: custom:mushroom-template-card
+          primary: X
+          secondary: '{{ states(''sensor.cubiko_x_position'') }} mm'
+          icon: mdi:axis-x-arrow
+          icon_color: blue
+          card_mod:
+            style: |
+              ha-card {
+                background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+                border: 2px solid rgba(255,255,255,0.18) !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+                border-radius: 12px;
+              }
+        - type: custom:mushroom-template-card
+          primary: 'Y'
+          secondary: '{{ states(''sensor.cubiko_y_position'') }} mm'
+          icon: mdi:axis-y-arrow
+          icon_color: green
+          card_mod:
+            style: |
+              ha-card {
+                background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+                border: 2px solid rgba(255,255,255,0.18) !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+                border-radius: 12px;
+              }
+        - type: custom:mushroom-template-card
+          primary: Z
+          secondary: '{{ states(''sensor.cubiko_z_position'') }} mm'
+          icon: mdi:axis-z-arrow
+          icon_color: orange
+          card_mod:
+            style: |
+              ha-card {
+                background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+                border: 2px solid rgba(255,255,255,0.18) !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+                border-radius: 12px;
+              }
+
+    - type: horizontal-stack
+      cards:
+        - type: gauge
+          entity: sensor.cubiko_feedrate
+          name: Feedrate
+          min: 0
+          max: 3000
+          severity:
+            green: 0
+            yellow: 1500
+            red: 2500
+          card_mod:
+            style: |
+              ha-card {
+                background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+                border: 2px solid rgba(255,255,255,0.18) !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+                border-radius: 12px;
+              }
+        - type: gauge
+          entity: sensor.cubiko_spindle_speed
+          name: Spindle RPM
+          min: 0
+          max: 24000
+          severity:
+            green: 0
+            yellow: 12000
+            red: 20000
+          card_mod:
+            style: |
+              ha-card {
+                background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+                border: 2px solid rgba(255,255,255,0.18) !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+                border-radius: 12px;
+              }
+
+    - type: custom:bar-card
+      entity: sensor.cubiko_job_progress
+      name: Job Progress
+      min: 0
+      max: 100
+      direction: right
+      animation:
+        state: 'on'
+        speed: 1
+      severity:
+        - from: 0
+          to: 50
+          color: '#007f6f'
+        - from: 50
+          to: 100
+          color: '#00bfa5'
+      title_position: inside
+      icon: mdi:progress-clock
+      show_icon: true
+      height: 26px
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+            border: 2px solid rgba(255,255,255,0.18) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+            border-radius: 12px;
+          }
+          .bar-container, .progress-bar-container {
+            background: rgba(0,0,0,0.45) !important;
+          }
+    - type: entities
+      title: Job Stats
+      entities:
+        - entity: sensor.cubiko_file_name
+          name: File Name
+        - entity: sensor.cubiko_job_size
+          name: File Size
+        - entity: sensor.cubiko_job_lines_done
+          name: Lines Done
+        - entity: sensor.cubiko_job_lines
+          name: Lines Total
+        - entity: sensor.cubiko_job_remaining_formatted
+          name: Remaining Time
+        - entity: sensor.cubiko_job_elapsed_formatted
+          name: Elapsed Time
+        - entity: sensor.cubiko_job_error
+          name: Last Error
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+            border: 2px solid rgba(255,255,255,0.18) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+            border-radius: 12px;
+          }
+    - type: entities
+      title: Machine Details
+      entities:
+        - entity: sensor.cubiko_probe_state
+          name: Probe
+        - entity: binary_sensor.cubiko_probe_triggered
+          name: Probe Pin
+        - entity: binary_sensor.cubiko_pcb_mode
+          name: PCB Mode
+        - entity: binary_sensor.cubiko_height_map_loaded
+          name: Height Map
+        - entity: sensor.cubiko_feed_override
+          name: Feed Override
+        - entity: sensor.cubiko_spindle_override
+          name: Spindle Override
+        - entity: sensor.cubiko_x_machine_position
+          name: X (machine)
+        - entity: sensor.cubiko_y_machine_position
+          name: Y (machine)
+        - entity: sensor.cubiko_z_machine_position
+          name: Z (machine)
+        - entity: sensor.cubiko_firmware
+          name: Controller Firmware
+        - entity: sensor.cubiko_demonx_version
+          name: DemonX Version
+        - entity: sensor.cubiko_port
+          name: Port
+      card_mod:
+        style: |
+          ha-card {
+            background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+            border: 2px solid rgba(255,255,255,0.18) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+            border-radius: 12px;
+          }
+    - type: custom:mushroom-chips-card
+      chips:
+        - type: template
+          icon: mdi:alert-circle-outline
+          content: |
+            {% if is_state('binary_sensor.cubiko_alarm_active', 'on') %}
+              **ALARM ACTIVE**
+            {% else %}
+              No Alarms
+            {% endif %}
+          icon_color: |
+            {% if is_state('binary_sensor.cubiko_alarm_active', 'on') %}
+              red
+            {% else %}
+              green
+            {% endif %}
+        - type: template
+          icon: mdi:pause-circle
+          content: |
+            {% if is_state('binary_sensor.cubiko_feed_hold', 'on') %}
+              **Feed Hold**
+            {% else %}
+              Clear
+            {% endif %}
+          icon_color: |
+            {% if is_state('binary_sensor.cubiko_feed_hold', 'on') %}
+              orange
+            {% else %}
+              green
+            {% endif %}
+        - type: template
+          icon: mdi:usb
+          content: |
+            {% if is_state('binary_sensor.cubiko_machine_connected', 'on') %}
+              Machine Connected
+            {% else %}
+              Machine Not Connected
+            {% endif %}
+          icon_color: |
+            {% if is_state('binary_sensor.cubiko_machine_connected', 'on') %}
+              teal
+            {% else %}
+              red
+            {% endif %}
+        - type: template
+          icon: mdi:lan-connect
+          content: |
+            {% if is_state('binary_sensor.cubiko_bridge_online', 'on') %}
+              Bridge Online
+            {% else %}
+              Bridge Offline
+            {% endif %}
+          icon_color: |
+            {% if is_state('binary_sensor.cubiko_bridge_online', 'on') %}
+              teal
+            {% else %}
+              red
+            {% endif %}
+      card_mod:
+        style: |
+          :host {
+            --ha-card-background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+          }
+          ha-card {
+            background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+            border: none !important;
+            box-shadow: 0 0 15px rgba(255,255,255,0.1) !important;
+            border-radius: 12px;
+            padding: 10px 8px 8px !important;
+          }
+          .chips {
+            background: transparent !important;
+          }
+          mushroom-chip,
+          mushroom-template-chip {
+            --chip-background: linear-gradient(160deg, #222 0%, #3a3a3a 100%) !important;
+            background: linear-gradient(160deg, #222 0%, #3a3a3a 100%) !important;
+            border: 2px solid rgba(255,255,255,0.22) !important;
+            border-radius: 9999px !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.45) !important;
+          }
+    - type: horizontal-stack
+      cards:
+        - type: button
+          name: Home
+          icon: mdi:home-export-outline
+          icon_height: 28px
+          tap_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.cubiko_home
+          card_mod:
+            style: |
+              ha-card {
+                background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+                border: 2px solid rgba(255,255,255,0.18) !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+                border-radius: 12px;
+              }
+        - type: button
+          name: Unlock
+          icon: mdi:lock-open-variant-outline
+          icon_height: 28px
+          tap_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.cubiko_unlock
+          card_mod:
+            style: |
+              ha-card {
+                background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+                border: 2px solid rgba(255,255,255,0.18) !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+                border-radius: 12px;
+              }
+        - type: button
+          name: Reset
+          icon: mdi:restart
+          icon_height: 28px
+          tap_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.cubiko_reset
+          card_mod:
+            style: |
+              ha-card {
+                background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+                border: 2px solid rgba(255,255,255,0.18) !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+                border-radius: 12px;
+              }
+
+    - type: horizontal-stack
+      cards:
+        - type: button
+          name: Feed Hold
+          icon: mdi:pause-circle
+          icon_height: 28px
+          tap_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.cubiko_feed_hold
+          card_mod:
+            style: |
+              ha-card {
+                background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+                border: 2px solid rgba(255,255,255,0.18) !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+                border-radius: 12px;
+              }
+        - type: button
+          name: Resume
+          icon: mdi:play-circle
+          icon_height: 28px
+          tap_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.cubiko_resume
+          card_mod:
+            style: |
+              ha-card {
+                background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+                border: 2px solid rgba(255,255,255,0.18) !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+                border-radius: 12px;
+              }
+        - type: button
+          name: 🛑 Stop
+          icon: mdi:alert-octagon
+          icon_height: 28px
+          tap_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.cubiko_stop
+            confirmation:
+              text: Abort the running job?
+          card_mod:
+            style: |
+              ha-card {
+                background: linear-gradient(160deg, #1a1a1a 0%, #333 100%) !important;
+                border: 2px solid rgba(255,255,255,0.18) !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+                border-radius: 12px;
+              }
+

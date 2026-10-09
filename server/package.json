@@ -1,0 +1,28 @@
+{
+  "name": "demonx-server",
+  "version": "2.0.0-test.2",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "set-pin": "tsx src/set-pin.ts"
+  },
+  "dependencies": {
+    "mqtt": "^5.16.0",
+    "serialport": "^12.0.0",
+    "ws": "^8.18.0",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.5.12",
+    "aedes": "^1.2.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

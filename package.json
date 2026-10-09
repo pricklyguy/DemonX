@@ -1,0 +1,27 @@
+{
+  "name": "demonx",
+  "version": "2.0.0-test.2",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "description": "DemonX CNC controller: server-owned GRBL connection, browser UI for any device on the network",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev -w server",
+    "dev:web": "npm run dev -w web",
+    "build": "npm run build -w web",
+    "start": "npm run start -w server",
+    "test": "npm test -w server",
+    "package:windows": "node scripts/build-windows.mjs",
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w web",
+    "set-pin": "npm run set-pin -w server --"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

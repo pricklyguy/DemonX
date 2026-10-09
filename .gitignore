@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.log
+.env
+data/
+dist-windows/
+
+# private working notes (not part of the project)
+docs/HANDOFF.md
+docs/private/

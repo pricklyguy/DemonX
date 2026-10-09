@@ -103,8 +103,8 @@ Camera video (RTSP) needs ffmpeg installed; Home Assistant cameras and Reolink s
 LICENSE
 -------
 DemonX is free software under the GNU General Public License, version 3 or later (see LICENSE.txt in this folder).
-You may share and change it under those terms. The source code is at github.com/pricklyguy/demonx
+You may share and change it under those terms. The source code is at github.com/pricklyguy/DemonX
 It comes with no warranty. Test with the machine's emergency stop in reach, and run new programs in the air first.
 This package also contains Node.js (MIT licence, node\LICENSE-node.txt) and open-source packages with their own licences.
 
-Project: Prickly Guy Creations (PGC), github.com/pricklyguy/demonx
+Project: Prickly Guy Creations (PGC), github.com/pricklyguy/DemonX

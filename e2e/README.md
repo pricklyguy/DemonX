@@ -20,6 +20,7 @@ node e2e/macros.mjs                                # Macros panel (fresh DEMONX_
 node e2e/viz-warning.mjs                           # the 'tool is outside this view' warning does not make the 3D view flicker (restart the server first)
 node e2e/ui-polish.mjs                             # port dropdown, Comfortable/Compact size setting, jog fields (fresh server)
 node e2e/stats.mjs                                # Settings > Stats & maintenance (fresh DEMONX_DATA)
+node e2e/gamepad.mjs                              # gamepad arming, hold-to-jog and the stops (fresh server, SIM_SPEED=1)
 node e2e/frame.mjs                                 # Frame button (restart the server first)
 node e2e/units.mjs                                 # mm / inch toggle (restart the server first: it leaves the simulator moved)
 DEMONX_DATA=/tmp/demonx-e2e node e2e/camera.mjs   # needs a FRESH data folder (starts with no camera set up)

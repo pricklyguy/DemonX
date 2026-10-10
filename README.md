@@ -71,6 +71,7 @@ Camera types (**Setup** in the panel, with a **Test** button that shows a pictur
 - **PCB mode** (fixture position, safe height, PCB Home, a checklist), **macros** (they cannot bypass the probe safety), a **spindle panel**, **controller settings** (GRBL `$` settings and FluidNC `config.yaml`, with backups)
 - **Access PIN**, on by default: a fresh install lets every device only *watch* until a PIN is set (on the DemonX computer, with a setup code from another device, or `npm run set-pin`). The DemonX computer itself never needs it; anything outside your home network, including VPNs such as Tailscale, needs the PIN
 - **Home Assistant** through MQTT (the machine as a device, with Home, Unlock, Reset, Feed Hold, Resume and Stop buttons) and events for automations; see [`docs/ha-dashboard.yaml`](docs/ha-dashboard.yaml)
+- **Gamepad** (Settings > Gamepad, off by default): jog with a game controller, hold-to-jog with an arm step, speed follows the stick, and the server stops the machine itself if the browser goes quiet
 - **Stats and maintenance** (Settings): total running hours, the recent jobs, and maintenance tasks that come due after so many hours of running (a dot on Settings shows when one is due)
 - **Windows package**, Raspberry Pi installer, millimetres or inches, colour options
 

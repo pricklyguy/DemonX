@@ -14,6 +14,7 @@ import { ConfigStore, ConfigError } from './config.js';
 import { CameraHub, listHaCameras } from './camera.js';
 import { MacroStore, MacroError } from './macros.js';
 import { StatsStore, StatsError } from './stats.js';
+import { JogHold } from './jogHold.js';
 import { MachineSettingsService, SettingsError } from './machinesettings.js';
 import { haStreamUrl, hlsPath, proxyHls } from './hastream.js';
 import { HaShare, makePoster } from './hashare.js';
@@ -39,6 +40,11 @@ const config = new ConfigStore(dataDir);
 const camera = new CameraHub(config);
 const macros = new MacroStore(dataDir);
 const stats = new StatsStore(dataDir);
+const jogHold = new JogHold({
+  blocked: () => controller.jogHoldBlocked(), segment: (l) => controller.jogHoldSegment(l),
+  cancel: () => controller.realtime(0x85), log: (k, t) => controller.log(k, t),
+});
+setInterval(() => jogHold.tick(), 100);
 const machineSettings = new MachineSettingsService(controller, dataDir);
 const auth = new AuthStore(dataDir);
 // The computer that runs DemonX (attached to the machine) never needs the PIN. DEMONX_TRUST_LOCAL=0 turns that off.
@@ -288,6 +294,9 @@ wss.on('connection', (ws, req) => {
             if (e instanceof MacroError) return send(ws, { type: 'macroResult', data: { ok: false, message: e.message } });
             throw e;
           }
+        case 'jogHold': return jogHold.hold(ws, { x: Number(msg.x), y: Number(msg.y), z: Number(msg.z) });
+        case 'jogRelease': return jogHold.release(ws);
+        case 'jogCancel': jogHold.abort(); return controller.handle(msg);
         case 'macroDelete': return macros.remove(msg.id);
         case 'maintSave': case 'maintServiced': case 'maintDelete': case 'statsSetHours':
           try {
@@ -335,7 +344,7 @@ wss.on('connection', (ws, req) => {
       controller.log('err', (e as Error).message);
     }
   });
-  ws.on('close', () => broadcast({ type: 'clients', data: wss.clients.size }));
+  ws.on('close', () => { jogHold.drop(ws); broadcast({ type: 'clients', data: wss.clients.size }); });
 });
 
 // A busy port is the most common startup failure: say so plainly instead of a stack trace.

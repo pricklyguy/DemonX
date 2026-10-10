@@ -407,6 +407,9 @@ export type ClientMessage =
   | { type: 'send'; line: string }
   | { type: 'jog'; dx?: number; dy?: number; dz?: number; feed: number }
   | { type: 'jogCancel' }
+  /** Hold-to-jog: the speed wanted on each axis in mm/min, repeated about ten times a second for as long as the movement is wanted (see server/src/jogHold.ts) */
+  | { type: 'jogHold'; x: number; y: number; z: number }
+  | { type: 'jogRelease' }
   | { type: 'home' }
   | { type: 'unlock' }
   | { type: 'zero'; axes: JogAxis[] }

@@ -5,6 +5,7 @@ import { SettingsDrawer } from './Settings';
 import { PhoneDialog, ViewOnlyBar } from './Access';
 import { SettingsContext, useSettings, type SettingsPage } from './settingsContext';
 import { useColors, useDensity } from './appearance';
+import { useGamepad, type PadState } from './gamepad';
 import { CameraPanel } from './CameraPanel';
 import { MacrosPanel } from './MacrosPanel';
 import { SpindlePanel } from './SpindlePanel';
@@ -43,6 +44,7 @@ export function App() {
 
   const colors = useColors(theme);
   const [density, setDensity] = useDensity();
+  const pad = useGamepad(m);
 
   const panels: Record<PanelId, React.ReactNode> = {
     connection: <ConnectPanel m={m} />,
@@ -63,17 +65,17 @@ export function App() {
   return (
     <UnitsProvider><LayoutProvider><SettingsContext.Provider value={{ open: openSettings }}>
       <div className="app">
-        <Header m={m} theme={theme} setTheme={setTheme} onSettings={() => (settings ? setSettings(null) : openSettings())} settingsOpen={!!settings} />
+        <Header m={m} pad={pad} theme={theme} setTheme={setTheme} onSettings={() => (settings ? setSettings(null) : openSettings())} settingsOpen={!!settings} />
         <ViewOnlyBar m={m} />
         <Dock panels={panels} />
         <ProbeDialog m={m} />
-        {settings && <SettingsDrawer m={m} page={settings.page} setPage={(page) => setSettings({ page })} onClose={() => setSettings(null)} theme={theme} setTheme={setTheme} colors={colors} density={density} setDensity={setDensity} />}
+        {settings && <SettingsDrawer m={m} page={settings.page} setPage={(page) => setSettings({ page })} onClose={() => setSettings(null)} theme={theme} setTheme={setTheme} colors={colors} density={density} setDensity={setDensity} pad={pad} />}
       </div>
     </SettingsContext.Provider></LayoutProvider></UnitsProvider>
   );
 }
 
-function Header({ m, theme, setTheme, onSettings, settingsOpen }: { m: Machine; theme: string; setTheme: (t: 'dark' | 'light') => void; onSettings: () => void; settingsOpen: boolean }) {
+function Header({ m, pad, theme, setTheme, onSettings, settingsOpen }: { m: Machine; pad: PadState; theme: string; setTheme: (t: 'dark' | 'light') => void; onSettings: () => void; settingsOpen: boolean }) {
   const s = m.status.state;
   const u = useUnits();
   const settings = useSettings();
@@ -93,6 +95,7 @@ function Header({ m, theme, setTheme, onSettings, settingsOpen }: { m: Machine; 
         onClick={() => (m.config.pcb.enabled ? m.send({ type: 'configSet', update: { pcb: { enabled: false } } }) : m.config.pcb.configured ? m.send({ type: 'configSet', update: { pcb: { enabled: true } } }) : settings.open('pcb'))}>
         {m.config.pcb.enabled ? '▣ PCB MODE ON ✕' : '▣ PCB'}
       </button>
+      {pad.enabled && pad.name && <span className={`padbadge ${pad.armed ? 'on' : ''}`} title={pad.armed ? 'Gamepad armed: the sticks move the machine. B stops, Back disarms.' : 'Gamepad connected but not armed: press Start with the sticks centred'}>🎮 {pad.armed ? 'armed' : 'press Start'}</span>}
       <button className="btn ghost" title="Open DemonX on a phone or another computer: address and QR code" aria-label="Open DemonX on a phone" onClick={() => setPhone(true)}>📱</button>
       <button className={`btn ghost ${settingsOpen ? 'on' : ''}`} aria-expanded={settingsOpen} onClick={onSettings}>⚙ Settings{m.stats.tasks.some((t) => t.due) && <span className="duedot" title="A maintenance task is due (Settings > Stats & maintenance)" aria-label="Maintenance due"> ●</span>}</button>
       <button className="btn ghost" title="Show lengths in millimetres or inches (this browser only; the machine always works in mm)" onClick={() => u.setUnit(u.unit === 'mm' ? 'in' : 'mm')}>{u.unit === 'mm' ? 'mm' : 'inch'}</button>

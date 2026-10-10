@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type {
-  CameraState, ClientMessage, Macro, Snapshot, ConnectionInfo, HaCamera, HeightMap, HeightMapSummary, JobInfo, LogLine, MachineStatus, PortInfo, ProbeInfo, PublicConfig, ServerMessage,
+  CameraState, ClientMessage, Macro, Snapshot, ConnectionInfo, HaCamera, HeightMap, HeightMapSummary, JobInfo, LogLine, MachineStatus, PortInfo, ProbeInfo, PublicConfig, ServerMessage, StatsInfo,
 } from '../../shared/protocol';
 import type { MachineSettings } from '../../shared/machine-settings';
-import { emptyJob, emptyProbe, emptyPublicConfig, emptyStatus } from '../../shared/protocol';
+import { emptyJob, emptyProbe, emptyPublicConfig, emptyStats, emptyStatus } from '../../shared/protocol';
 
 export interface Replies {
   haCameras?: { n: number; data: { cameras: HaCamera[] } | { error: string } };
@@ -12,6 +12,7 @@ export interface Replies {
   haShareResult?: { n: number; data: { ok: boolean; message: string } };
   configResult?: { n: number; data: { ok: boolean; message?: string } };
   macroResult?: { n: number; data: { ok: boolean; message?: string } };
+  statsResult?: { n: number; data: { ok: boolean; message?: string } };
   machineSettings?: { n: number; data: MachineSettings };
   machineSettingsResult?: { n: number; data: { ok: boolean; message: string } };
 }
@@ -27,6 +28,7 @@ export interface Machine {
   config: PublicConfig;
   camera: CameraState;
   macros: Macro[];
+  stats: StatsInfo;
   /** Answers to one-off requests (camera list, test, save). `n` changes with every new answer. */
   replies: Replies;
   clients: number;
@@ -50,6 +52,7 @@ export function useMachine(): Machine {
   const [config, setConfig] = useState<PublicConfig>(emptyPublicConfig());
   const [camera, setCamera] = useState<CameraState>({ running: false, viewers: 0, fps: 0 });
   const [macros, setMacros] = useState<Macro[]>([]);
+  const [stats, setStats] = useState<StatsInfo>(emptyStats());
   const [replies, setReplies] = useState<Replies>({});
   const [clients, setClients] = useState(0);
   const [log, setLog] = useState<LogLine[]>([]);
@@ -74,7 +77,7 @@ export function useMachine(): Machine {
         const m: ServerMessage = JSON.parse(ev.data);
         switch (m.type) {
           case 'snapshot':
-            setConnection(m.data.connection); setStatus(m.data.status); setJob(m.data.job); setProbe(m.data.probe); setHeightmap(m.data.heightmap); setHeightmapSaved(m.data.heightmapSaved); setConfig(m.data.config); setCamera(m.data.camera); setMacros(m.data.macros);
+            setConnection(m.data.connection); setStatus(m.data.status); setJob(m.data.job); setProbe(m.data.probe); setHeightmap(m.data.heightmap); setHeightmapSaved(m.data.heightmapSaved); setConfig(m.data.config); setCamera(m.data.camera); setMacros(m.data.macros); setStats(m.data.stats ?? emptyStats());
             setClients(m.data.clients); setLog(m.data.log); setAuth(m.data.auth); setAddresses(m.data.addresses ?? []); break;
           case 'status': setStatus(m.data); break;
           case 'job': setJob(m.data); break;
@@ -84,7 +87,8 @@ export function useMachine(): Machine {
           case 'config': setConfig(m.data); break;
           case 'camera': setCamera(m.data); break;
           case 'macros': setMacros(m.data); break;
-          case 'haCameras': case 'haShareResult': case 'mqttResult': case 'cameraTest': case 'configResult': case 'macroResult': case 'machineSettings': case 'machineSettingsResult':
+          case 'stats': setStats(m.data); break;
+          case 'haCameras': case 'haShareResult': case 'mqttResult': case 'cameraTest': case 'configResult': case 'macroResult': case 'statsResult': case 'machineSettings': case 'machineSettingsResult':
             setReplies((r) => ({ ...r, [m.type]: { n: (r[m.type]?.n ?? 0) + 1, data: m.data } }));
             break;
           case 'connection': setConnection(m.data); break;
@@ -103,5 +107,5 @@ export function useMachine(): Machine {
     if (ws.current?.readyState === WebSocket.OPEN) ws.current.send(JSON.stringify(m));
   }, []);
 
-  return { online, connection, status, job, probe, heightmap, heightmapSaved, config, camera, macros, replies, clients, log, ports, auth, addresses, send };
+  return { online, connection, status, job, probe, heightmap, heightmapSaved, config, camera, macros, stats, replies, clients, log, ports, auth, addresses, send };
 }

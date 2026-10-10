@@ -9,6 +9,7 @@ import { useUnits } from './units';
 import { ACCENT_PRESETS, COLOR_KEYS, DEFAULTS, LABELS, problems, type ColorKey } from '../../shared/colors';
 import type { Colors, Density } from './appearance';
 import type { Machine } from './useMachine';
+import { StatsPage } from './Stats';
 import type { SettingsPage } from './settingsContext';
 
 // The Settings drawer. Pages are grouped by who they affect: this browser only (layout, units,
@@ -18,7 +19,7 @@ const GROUPS: { title: string; hint: string; pages: { id: SettingsPage; label: s
   { title: 'This browser', hint: 'Only this browser: other computers and phones keep their own', pages: [
     { id: 'layout', label: 'Layout' }, { id: 'units', label: 'Units' }, { id: 'appearance', label: 'Appearance' } ] },
   { title: 'This machine', hint: 'Shared: every browser sees the same', pages: [
-    { id: 'camera', label: 'Camera' }, { id: 'homeassistant', label: 'Home Assistant' }, { id: 'spindle', label: 'Spindle' }, { id: 'pcb', label: 'PCB mode' }, { id: 'controller', label: 'Controller' }, { id: 'access', label: 'Access' } ] },
+    { id: 'camera', label: 'Camera' }, { id: 'homeassistant', label: 'Home Assistant' }, { id: 'spindle', label: 'Spindle' }, { id: 'pcb', label: 'PCB mode' }, { id: 'controller', label: 'Controller' }, { id: 'stats', label: 'Stats & maintenance' }, { id: 'access', label: 'Access' } ] },
 ];
 
 export function SettingsDrawer({ m, page, setPage, onClose, theme, setTheme, colors, density, setDensity }: {
@@ -70,6 +71,7 @@ export function SettingsDrawer({ m, page, setPage, onClose, theme, setTheme, col
         {page === 'spindle' && <SpindleSetup m={m} onClose={onClose} onSaved={flash} />}
         {page === 'controller' && <ControllerSettings m={m} />}
         {page === 'access' && <AccessSettings m={m} />}
+        {page === 'stats' && <StatsPage m={m} />}
         {page === 'pcb' && <PcbSettings m={m} onSaved={flash} />}
       </div>
     </aside>

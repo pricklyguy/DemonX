@@ -94,7 +94,7 @@ function Header({ m, theme, setTheme, onSettings, settingsOpen }: { m: Machine; 
         {m.config.pcb.enabled ? '▣ PCB MODE ON ✕' : '▣ PCB'}
       </button>
       <button className="btn ghost" title="Open DemonX on a phone or another computer: address and QR code" aria-label="Open DemonX on a phone" onClick={() => setPhone(true)}>📱</button>
-      <button className={`btn ghost ${settingsOpen ? 'on' : ''}`} aria-expanded={settingsOpen} onClick={onSettings}>⚙ Settings</button>
+      <button className={`btn ghost ${settingsOpen ? 'on' : ''}`} aria-expanded={settingsOpen} onClick={onSettings}>⚙ Settings{m.stats.tasks.some((t) => t.due) && <span className="duedot" title="A maintenance task is due (Settings > Stats & maintenance)" aria-label="Maintenance due"> ●</span>}</button>
       <button className="btn ghost" title="Show lengths in millimetres or inches (this browser only; the machine always works in mm)" onClick={() => u.setUnit(u.unit === 'mm' ? 'in' : 'mm')}>{u.unit === 'mm' ? 'mm' : 'inch'}</button>
       <button className="btn ghost" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{theme === 'dark' ? '☀ Light' : '☾ Dark'}</button>
       {phone && <PhoneDialog m={m} onClose={() => setPhone(false)} />}

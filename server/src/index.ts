@@ -13,6 +13,7 @@ import { HeightMapStore, validateHeightMap } from './heightmap.js';
 import { ConfigStore, ConfigError } from './config.js';
 import { CameraHub, listHaCameras } from './camera.js';
 import { MacroStore, MacroError } from './macros.js';
+import { StatsStore, StatsError } from './stats.js';
 import { MachineSettingsService, SettingsError } from './machinesettings.js';
 import { haStreamUrl, hlsPath, proxyHls } from './hastream.js';
 import { HaShare, makePoster } from './hashare.js';
@@ -37,6 +38,7 @@ const heightmaps = new HeightMapStore(dataDir, { autoload: autoloadMap });
 const config = new ConfigStore(dataDir);
 const camera = new CameraHub(config);
 const macros = new MacroStore(dataDir);
+const stats = new StatsStore(dataDir);
 const machineSettings = new MachineSettingsService(controller, dataDir);
 const auth = new AuthStore(dataDir);
 // The computer that runs DemonX (attached to the machine) never needs the PIN. DEMONX_TRUST_LOCAL=0 turns that off.
@@ -199,6 +201,10 @@ heightmaps.on('saved', (d) => broadcast({ type: 'heightmapSaved', data: d }));
 config.on('config', (d) => broadcast({ type: 'config', data: d }));
 config.on('config', () => { if (!config.full.pcb.enabled) controller.clearPcbHomed(); });
 macros.on('macros', (d) => broadcast({ type: 'macros', data: d }));
+stats.on('stats', (d) => broadcast({ type: 'stats', data: d }));
+controller.on('job', (j) => stats.observe(j));
+// the running hours of a job in progress move on without any job update
+setInterval(() => { if (controller.job.state === 'running') broadcast({ type: 'stats', data: stats.view() }); }, 60_000);
 camera.on('state', (d) => broadcast({ type: 'camera', data: d }));
 controller.on('log', (d) => broadcast({ type: 'log', data: d }));
 // a PIN was set, changed or removed, or someone signed out: reconnect everybody so each browser learns its new role
@@ -212,7 +218,7 @@ wss.on('connection', (ws, req) => {
   send(ws, {
     type: 'snapshot',
     data: {
-      connection: controller.connection, status: controller.status, job: controller.job, probe: probe.info, heightmap: heightmaps.map, heightmapSaved: heightmaps.saved, config: config.view, camera: camera.state, macros: macros.list,
+      connection: controller.connection, status: controller.status, job: controller.job, probe: probe.info, heightmap: heightmaps.map, heightmapSaved: heightmaps.saved, config: config.view, camera: camera.state, macros: macros.list, stats: stats.view(),
       clients: wss.clients.size, log: controller.logBuffer.slice(-100),
       auth: { required: auth.mode === 'pin', operator: mayControl(req, token), local: peerOf(req) === 'local', mode: auth.mode, peer: peerOf(req) },
       addresses: lanUrls(PORT),
@@ -283,6 +289,17 @@ wss.on('connection', (ws, req) => {
             throw e;
           }
         case 'macroDelete': return macros.remove(msg.id);
+        case 'maintSave': case 'maintServiced': case 'maintDelete': case 'statsSetHours':
+          try {
+            if (msg.type === 'maintSave') stats.saveTask(msg.task);
+            else if (msg.type === 'maintServiced') stats.serviced(msg.id);
+            else if (msg.type === 'maintDelete') stats.deleteTask(msg.id);
+            else stats.setHours(msg.hours);
+            return send(ws, { type: 'statsResult', data: { ok: true } });
+          } catch (e) {
+            if (e instanceof StatsError) return send(ws, { type: 'statsResult', data: { ok: false, message: e.message } });
+            throw e;
+          }
         case 'macroRun': {
           const m = macros.find(msg.id);
           return m ? void controller.runMacro(m.name, m.content) : controller.log('err', 'That macro no longer exists');

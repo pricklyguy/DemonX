@@ -290,6 +290,43 @@ export interface CameraState {
   error?: string;
 }
 
+/** One finished (or stopped) run of a job, for the stats page */
+export interface RunRecord {
+  id: string;
+  name: string;
+  startedAt: number;
+  /** Time actually running: pauses are not counted */
+  runMs: number;
+  result: 'done' | 'stopped' | 'error';
+  lines: number;
+}
+
+/** A recurring maintenance task, due after so many hours of machine running time */
+export interface MaintTask {
+  id: string;
+  name: string;
+  everyHours: number;
+  /** Running hours at the last service, and when that was (ms since 1970) */
+  doneAtHours: number;
+  doneAt?: number;
+  /** Worked out by the server from the running time now */
+  sinceHours: number;
+  dueInHours: number;
+  due: boolean;
+}
+
+/** Job statistics and maintenance, kept on the server (see server/src/stats.ts) */
+export interface StatsInfo {
+  totalHours: number;
+  jobs: number;
+  done: number;
+  stopped: number;
+  errors: number;
+  /** Newest first */
+  recent: RunRecord[];
+  tasks: MaintTask[];
+}
+
 /** A saved macro: lines of G-code run with one tap (see server/src/macros.ts) */
 export interface Macro { id: string; name: string; content: string }
 
@@ -306,6 +343,7 @@ export interface Snapshot {
   config: PublicConfig;
   camera: CameraState;
   macros: Macro[];
+  stats: StatsInfo;
   clients: number;
   log: LogLine[];
   /** mode: pin (a PIN is set), setup (no PIN yet, nobody but the DemonX computer may control), open (no PIN, chosen on purpose). peer: where this browser connects from. required: a PIN is set. operator: this browser may control the machine (always true while no PIN is set). local: it is on the DemonX computer itself, which never needs the PIN. */
@@ -324,6 +362,9 @@ export type ServerMessage =
   | { type: 'heightmapSaved'; data: HeightMapSummary | null }
   | { type: 'config'; data: PublicConfig }
   | { type: 'macros'; data: Macro[] }
+  | { type: 'stats'; data: StatsInfo }
+  /** The answer to a stats or maintenance change, to the browser that sent it */
+  | { type: 'statsResult'; data: { ok: boolean; message?: string } }
   /** The controller's settings, to the browser that asked */
   | { type: 'machineSettings'; data: MachineSettings }
   | { type: 'machineSettingsResult'; data: { ok: boolean; message: string } }
@@ -351,6 +392,12 @@ export type ClientMessage =
   | { type: 'macroSave'; macro: { id?: string; name: string; content: string } }
   | { type: 'macroDelete'; id: string }
   | { type: 'macroRun'; id: string }
+  | { type: 'maintSave'; task: { id?: string; name: string; everyHours: number } }
+  | { type: 'maintDelete'; id: string }
+  /** A task was done: start counting its hours again from now */
+  | { type: 'maintServiced'; id: string }
+  /** Set the machine's total running hours (for a machine that has run before DemonX) */
+  | { type: 'statsSetHours'; hours: number }
   | { type: 'settingsRead' }
   | { type: 'settingsApply'; changes: SettingChange[] }
   | { type: 'settingsSave' }
@@ -423,3 +470,5 @@ export const emptyJob = (): JobInfo => ({
   doneLines: 0,
   elapsedMs: 0,
 });
+
+export const emptyStats = (): StatsInfo => ({ totalHours: 0, jobs: 0, done: 0, stopped: 0, errors: 0, recent: [], tasks: [] });

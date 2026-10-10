@@ -245,3 +245,16 @@ table.ext tbody th { background: var(--panel2); color: var(--accent); text-align
 :root[data-density='compact'] .pad { grid-template-columns: repeat(3, 44px); }
 :root[data-density='compact'] .btn.jog { height: 44px; } :root[data-density='compact'] .zpad .btn.jog { width: 44px; }
 :root[data-density='compact'] .steprow .btn { min-width: 36px; }
+
+/* Settings > Stats & maintenance */
+.statgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+.statgrid > div { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; display: flex; flex-direction: column; }
+.statgrid b { font-size: 1.3em; }
+.maint { flex-wrap: wrap; border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; background: var(--bg); }
+.maint.due { border-color: var(--amber); }
+.maint-text { flex: 1 1 180px; display: flex; flex-direction: column; min-width: 0; }
+.duepill { background: var(--amber); color: #201400; border-radius: 10px; padding: 1px 8px; font-size: 12px; font-weight: 700; margin-left: 8px; white-space: nowrap; }
+.maint .duepill { margin-left: 0; }
+.statlist td { padding: 3px 8px 3px 0; }
+.statlist .runname { text-align: left; max-width: 14em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.duedot { color: var(--amber); }

@@ -219,6 +219,14 @@ card:
           name: DemonX Version
         - entity: sensor.cubiko_port
           name: Port
+        - entity: sensor.cubiko_machine_hours
+          name: Machine Hours
+        - entity: sensor.cubiko_jobs_run
+          name: Jobs Run
+        - entity: sensor.cubiko_next_maintenance
+          name: Next Maintenance
+        - entity: binary_sensor.cubiko_maintenance_due
+          name: Maintenance Due
       card_mod:
         style: |
           ha-card {

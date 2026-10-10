@@ -87,11 +87,11 @@ const appVersion = (() => {
 })();
 const mqttBridge = new MqttBridge(
   () => config.full.mqtt,
-  () => ({ status: controller.status, job: controller.job, connection: controller.connection, probe: probe.info, jobBytes: controller.job.state === 'none' ? 0 : Buffer.byteLength(controller.jobText()), pcb: config.full.pcb.enabled, heightmap: !!heightmaps.map, now: Date.now(), version: appVersion }),
+  () => ({ status: controller.status, job: controller.job, connection: controller.connection, probe: probe.info, jobBytes: controller.job.state === 'none' ? 0 : Buffer.byteLength(controller.jobText()), pcb: config.full.pcb.enabled, heightmap: !!heightmaps.map, now: Date.now(), version: appVersion, stats: stats.view() }),
   (cmd) => void controller.handle(HA_COMMANDS[cmd] as never),
   (kind, text) => controller.log(kind, text),
 );
-mqttBridge.attach(controller, probe);
+mqttBridge.attach(controller, probe, stats);
 mqttBridge.apply();
 config.on('config', () => mqttBridge.apply());
 for (const sig of ['SIGINT', 'SIGTERM'] as const) process.on(sig, () => { mqttBridge.stop(); setTimeout(() => process.exit(0), 300); });

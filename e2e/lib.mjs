@@ -42,8 +42,8 @@ export async function open(browser, w, h, opts = {}) {
 
 /** Connect to the built-in simulator, unless the server is already connected */
 export async function connect(p) {
-  if (await p.locator('input[list=ports]').count()) {
-    await p.fill('input[list=ports]', 'simulator');
+  if (await p.locator('select[aria-label="Serial port"]').count()) {
+    await p.selectOption('select[aria-label="Serial port"]', 'simulator');
     await p.getByRole('button', { name: 'Connect', exact: true }).click();
   }
   await p.waitForSelector('text=Connected to'); await p.waitForTimeout(400);

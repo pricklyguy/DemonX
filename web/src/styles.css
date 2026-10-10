@@ -233,3 +233,15 @@ table.ext tbody th { background: var(--panel2); color: var(--accent); text-align
 .viz-wrap { position: relative; display: flex; flex-direction: column; flex: 1; min-height: 120px; }
 .viz-wrap > .viz-canvas { flex: 1; min-height: 0; }
 .viz-warn { position: absolute; left: 8px; right: 8px; top: 8px; z-index: 2; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 6px 10px; border-radius: 6px; background: var(--panel); border: 1px solid var(--amber); color: var(--amber); font-weight: 600; font-size: 13px; }
+
+/* Number fields in panels (jog feed, probe values) are sized for a few digits, not stretched across the panel */
+.panel .row input[type=number] { flex: 0 1 7.5em; width: 7.5em; }
+.panel .row > .muted:not(.lbl) { white-space: nowrap; }
+
+/* Compact: tighter buttons, fields and panel padding (Settings > Appearance, kept per browser) */
+:root[data-density='compact'] .btn { padding: 4px 8px; }
+:root[data-density='compact'] input, :root[data-density='compact'] select { padding: 4px 6px; }
+:root[data-density='compact'] .body { padding: 8px; gap: 6px; }
+:root[data-density='compact'] .pad { grid-template-columns: repeat(3, 44px); }
+:root[data-density='compact'] .btn.jog { height: 44px; } :root[data-density='compact'] .zpad .btn.jog { width: 44px; }
+:root[data-density='compact'] .steprow .btn { min-width: 36px; }

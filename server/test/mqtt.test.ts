@@ -13,6 +13,28 @@ const snap = (over: Partial<Snapshot> = {}): Snapshot => ({
   connection: { connected: true, target: '/dev/ttyUSB0', firmware: 'Grbl 1.1h' }, probe: emptyProbe(), jobBytes: 4096, pcb: true, heightmap: true, now: 1_100_000, ...over,
 });
 
+describe('buildState: stats and maintenance', () => {
+  const task = (over: object) => ({ id: 'a', name: 'Oil the rails', everyHours: 40, doneAtHours: 0, sinceHours: 10, dueInHours: 30, due: false, ...over });
+  const stats = (tasks: ReturnType<typeof task>[]) => ({ totalHours: 12.345, jobs: 7, done: 6, stopped: 1, errors: 0, recent: [], tasks });
+  it('reports hours, jobs and what is due next', () => {
+    const s = buildState(snap({ stats: stats([task({}), task({ id: 'b', name: 'Clean up', dueInHours: 2.5 })]) }));
+    expect(s).toMatchObject({ machine_hours: 12.35, jobs_run: 7, maintenance_due: false, maintenance_due_count: 0, maintenance_next: 'Clean up (in 2.5 h)' });
+  });
+  it('says so when a task is overdue, in minutes when under an hour', () => {
+    const s = buildState(snap({ stats: stats([task({ due: true, dueInHours: -0.5 }), task({ id: 'c', dueInHours: 9 })]) }));
+    expect(s).toMatchObject({ maintenance_due: true, maintenance_due_count: 1, maintenance_next: 'Oil the rails (30 min overdue)' });
+  });
+  it('has quiet defaults before the stats exist or with no tasks', () => {
+    expect(buildState(snap())).toMatchObject({ machine_hours: 0, jobs_run: 0, maintenance_due: false, maintenance_next: 'No tasks' });
+    expect(buildState(snap({ stats: stats([]) })).maintenance_next).toBe('No tasks');
+  });
+  it('the new entities are discovered with the right classes', () => {
+    const find = (k: string) => discovery('Shop').find((d) => d.topic.endsWith(`/${k}/config`))!.payload;
+    expect(find('machine_hours')).toMatchObject({ unit_of_measurement: 'h', device_class: 'duration', state_class: 'total' });
+    expect(find('maintenance_due')).toMatchObject({ device_class: 'problem' });
+  });
+});
+
 describe('buildState', () => {
   it('reports the machine and the job', () => {
     const s = buildState(snap());

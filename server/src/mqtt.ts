@@ -1,6 +1,6 @@
 import type { EventEmitter } from 'node:events';
 import mqtt, { type MqttClient } from 'mqtt';
-import type { ConnectionInfo, JobInfo, MachineStatus, ProbeInfo } from '../../shared/protocol.js';
+import type { ConnectionInfo, JobInfo, MachineStatus, ProbeInfo, StatsInfo } from '../../shared/protocol.js';
 import type { AppConfig } from './config.js';
 
 /**
@@ -23,7 +23,7 @@ const fmtTime = (ms: number | undefined): string => {
   return h ? `${h}:${two(m)}:${two(r)}` : `${two(m)}:${two(r)}`;
 };
 
-export interface Snapshot { status: MachineStatus; job: JobInfo; connection: ConnectionInfo; probe: ProbeInfo; jobBytes: number; pcb: boolean; heightmap: boolean; now: number; version?: string }
+export interface Snapshot { status: MachineStatus; job: JobInfo; connection: ConnectionInfo; probe: ProbeInfo; jobBytes: number; pcb: boolean; heightmap: boolean; now: number; version?: string; stats?: StatsInfo }
 
 /** Everything published in the one state message. Pure, so it is tested without a broker. */
 export function buildState(s: Snapshot): Record<string, string | number | boolean> {
@@ -36,6 +36,10 @@ export function buildState(s: Snapshot): Record<string, string | number | boolea
   // an estimate from the lines done so far: rough while the first few lines run, better as the job goes on
   const remainingMs = job.state === 'done' ? 0 : running && done > 0 ? (elapsedMs * (total - done)) / done : undefined;
   const r = (n: number) => Math.round(n * 1000) / 1000;
+  const st = s.stats;
+  const due = st ? st.tasks.filter((t) => t.due) : [];
+  const next = st ? [...st.tasks].sort((a, b) => a.dueInHours - b.dueInHours)[0] : undefined;
+  const hrs = (h: number) => (Math.abs(h) < 1 ? `${Math.round(Math.abs(h) * 60)} min` : `${Math.round(Math.abs(h) * 10) / 10} h`);
   return {
     machine_state: connected ? status.state : 'Disconnected',
     connected,
@@ -60,10 +64,15 @@ export function buildState(s: Snapshot): Record<string, string | number | boolea
     firmware: connection.firmware ?? '',
     demonx_version: s.version ?? '',
     port: connection.target,
+    machine_hours: st ? Math.round(st.totalHours * 100) / 100 : 0,
+    jobs_run: st?.jobs ?? 0,
+    maintenance_due: due.length > 0,
+    maintenance_due_count: due.length,
+    maintenance_next: next ? `${next.name} (${next.due ? `${hrs(next.dueInHours)} overdue` : `in ${hrs(next.dueInHours)}`})` : 'No tasks',
   };
 }
 
-interface Ent { kind: 'sensor' | 'binary_sensor'; key: string; name: string; unit?: string; icon?: string; cls?: string; measurement?: boolean; category?: 'diagnostic'; off?: boolean }
+interface Ent { kind: 'sensor' | 'binary_sensor'; key: string; name: string; unit?: string; icon?: string; cls?: string; measurement?: boolean; category?: 'diagnostic'; off?: boolean; total?: boolean }
 export const ENTITIES: Ent[] = [
   { kind: 'sensor', key: 'machine_state', name: 'Machine State', icon: 'mdi:robot-industrial' },
   { kind: 'sensor', key: 'job_state', name: 'Job State', icon: 'mdi:file-cog-outline' },
@@ -90,6 +99,11 @@ export const ENTITIES: Ent[] = [
   { kind: 'sensor', key: 'firmware', name: 'Firmware', icon: 'mdi:chip', category: 'diagnostic' },
   { kind: 'sensor', key: 'demonx_version', name: 'DemonX Version', icon: 'mdi:tag-outline', category: 'diagnostic' },
   { kind: 'sensor', key: 'port', name: 'Port', icon: 'mdi:usb-port', category: 'diagnostic' },
+  { kind: 'sensor', key: 'machine_hours', name: 'Machine Hours', unit: 'h', icon: 'mdi:clock-outline', cls: 'duration', total: true },
+  { kind: 'sensor', key: 'jobs_run', name: 'Jobs Run', icon: 'mdi:counter', total: true },
+  { kind: 'sensor', key: 'maintenance_due_count', name: 'Maintenance Tasks Due', icon: 'mdi:wrench-clock', measurement: true },
+  { kind: 'sensor', key: 'maintenance_next', name: 'Next Maintenance', icon: 'mdi:wrench-outline' },
+  { kind: 'binary_sensor', key: 'maintenance_due', name: 'Maintenance Due', icon: 'mdi:wrench-clock', cls: 'problem' },
   { kind: 'binary_sensor', key: 'alarm_active', name: 'Alarm Active', icon: 'mdi:alert-circle-outline', cls: 'problem' },
   { kind: 'binary_sensor', key: 'feed_hold', name: 'Feed Hold', icon: 'mdi:pause-circle' },
   { kind: 'binary_sensor', key: 'connected', name: 'Machine Connected', icon: 'mdi:usb', cls: 'connectivity' },
@@ -124,7 +138,7 @@ export function discovery(name: string): { topic: string; payload: Record<string
         state_topic: `${base}/state`,
         value_template: e.kind === 'binary_sensor' ? `{{ 'ON' if value_json.${e.key} else 'OFF' }}` : `{{ value_json.${e.key} }}`,
         ...(e.unit ? { unit_of_measurement: e.unit } : {}), ...(e.icon ? { icon: e.icon } : {}), ...(e.cls ? { device_class: e.cls } : {}),
-        ...(e.measurement ? { state_class: 'measurement' } : {}), ...(e.category ? { entity_category: e.category } : {}),
+        ...(e.measurement ? { state_class: 'measurement' } : {}), ...(e.total ? { state_class: 'total' } : {}), ...(e.category ? { entity_category: e.category } : {}),
       },
     });
   }
@@ -184,9 +198,10 @@ export class MqttBridge {
     private throttleMs = 500,
   ) {}
 
-  attach(ctl: EventEmitter, probe: EventEmitter) {
+  attach(ctl: EventEmitter, probe: EventEmitter, stats?: EventEmitter) {
     for (const ev of ['status', 'job', 'connection']) ctl.on(ev, () => this.schedule());
     probe.on('probe', () => this.schedule());
+    stats?.on('stats', () => this.schedule());
   }
 
   /** Start, stop or restart to match the saved settings. Called at startup and whenever they change. */

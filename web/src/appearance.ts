@@ -42,3 +42,17 @@ export function useColors(mode: Mode): Colors {
 }
 
 export { COLOR_KEYS };
+
+export type Density = 'comfortable' | 'compact';
+
+/** Comfortable (the default) or compact spacing, kept per browser and applied as data-density on the page */
+export function useDensity(): [Density, (d: Density) => void] {
+  const [d, setD] = useState<Density>(() => {
+    try { return localStorage.getItem('density') === 'compact' ? 'compact' : 'comfortable'; } catch { return 'comfortable'; }
+  });
+  useEffect(() => {
+    document.documentElement.dataset.density = d;
+    try { localStorage.setItem('density', d); } catch { /* not saved in private mode */ }
+  }, [d]);
+  return [d, setD];
+}

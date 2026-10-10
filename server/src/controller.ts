@@ -30,7 +30,7 @@ export function detectLeveled(name: string, lines: string[]): { source: 'header'
 }
 
 interface Pending { len: number; job: boolean; resolve?: (r: AckResult) => void }
-interface Queued { line: string; resolve?: (r: AckResult) => void }
+interface Queued { line: string; resolve?: (r: AckResult) => void; quiet?: boolean }
 export interface ProbeHit { pos: Vec3; success: boolean }
 
 const OVERRIDE_BYTES: Record<string, Record<string, number>> = {
@@ -227,6 +227,22 @@ export class GrblController extends EventEmitter {
     this.pump();
   }
 
+  /** Why a held jog may not run right now, or null when it may (see jogHold.ts) */
+  jogHoldBlocked(): string | null {
+    if (!this.connection.connected) return 'Not connected';
+    if (this.lock) return this.lock;
+    if (this.job.state === 'running' || this.job.state === 'paused') return 'A job is running';
+    if (this.status.state === 'Alarm' || this.status.state.startsWith('Door') || this.status.state === 'Home' || this.status.state === 'Check') return `The machine is in ${this.status.state}`;
+    return null;
+  }
+
+  /** One short jog segment of a held jog: not shown in the console, which would fill with them */
+  jogHoldSegment(line: string) {
+    if (this.jogHoldBlocked()) return;
+    this.manualQueue.push({ line, quiet: true });
+    this.pump();
+  }
+
   /**
    * Internal send for server-driven sequences (probing). Bypasses the client
    * lock. Resolves when the controller acknowledges the line; never rejects.
@@ -306,9 +322,11 @@ export class GrblController extends EventEmitter {
       let line: string | undefined;
       let isJob = false;
       let resolve: Queued['resolve'];
+      let quiet = false;
       if (this.manualQueue.length) {
         line = this.manualQueue[0].line;
         resolve = this.manualQueue[0].resolve;
+        quiet = !!this.manualQueue[0].quiet;
       } else if (this.job.state === 'running' && this.jobIndex < this.jobLines.length) {
         line = this.jobLines[this.jobIndex];
         isJob = true;
@@ -320,7 +338,7 @@ export class GrblController extends EventEmitter {
       this.pending.push({ len, job: isJob, resolve });
       this.used += len;
       this.transport.write(line + '\n');
-      this.log('tx', line);
+      if (!quiet) this.log('tx', line);
       if (isJob) this.emitJob();
     }
   }

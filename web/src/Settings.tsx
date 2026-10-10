@@ -7,8 +7,11 @@ import { PcbSettings } from './PcbPanel';
 import { AccessSettings } from './Access';
 import { useUnits } from './units';
 import { ACCENT_PRESETS, COLOR_KEYS, DEFAULTS, LABELS, problems, type ColorKey } from '../../shared/colors';
-import type { Colors } from './appearance';
+import type { Colors, Density } from './appearance';
 import type { Machine } from './useMachine';
+import { StatsPage } from './Stats';
+import { GamepadPage } from './GamepadPage';
+import type { PadState } from './gamepad';
 import type { SettingsPage } from './settingsContext';
 
 // The Settings drawer. Pages are grouped by who they affect: this browser only (layout, units,
@@ -16,13 +19,13 @@ import type { SettingsPage } from './settingsContext';
 
 const GROUPS: { title: string; hint: string; pages: { id: SettingsPage; label: string }[] }[] = [
   { title: 'This browser', hint: 'Only this browser: other computers and phones keep their own', pages: [
-    { id: 'layout', label: 'Layout' }, { id: 'units', label: 'Units' }, { id: 'appearance', label: 'Appearance' } ] },
+    { id: 'layout', label: 'Layout' }, { id: 'units', label: 'Units' }, { id: 'appearance', label: 'Appearance' }, { id: 'gamepad', label: 'Gamepad' } ] },
   { title: 'This machine', hint: 'Shared: every browser sees the same', pages: [
-    { id: 'camera', label: 'Camera' }, { id: 'homeassistant', label: 'Home Assistant' }, { id: 'spindle', label: 'Spindle' }, { id: 'pcb', label: 'PCB mode' }, { id: 'controller', label: 'Controller' }, { id: 'access', label: 'Access' } ] },
+    { id: 'camera', label: 'Camera' }, { id: 'homeassistant', label: 'Home Assistant' }, { id: 'spindle', label: 'Spindle' }, { id: 'pcb', label: 'PCB mode' }, { id: 'controller', label: 'Controller' }, { id: 'stats', label: 'Stats & maintenance' }, { id: 'access', label: 'Access' } ] },
 ];
 
-export function SettingsDrawer({ m, page, setPage, onClose, theme, setTheme, colors }: {
-  m: Machine; page: SettingsPage; setPage: (p: SettingsPage) => void; onClose: () => void; theme: string; setTheme: (t: 'dark' | 'light') => void; colors: Colors;
+export function SettingsDrawer({ m, page, setPage, onClose, theme, setTheme, colors, density, setDensity, pad }: {
+  m: Machine; pad: PadState; page: SettingsPage; setPage: (p: SettingsPage) => void; onClose: () => void; theme: string; setTheme: (t: 'dark' | 'light') => void; colors: Colors; density: Density; setDensity: (d: Density) => void;
 }) {
   const [saved, setSaved] = useState(false);
   // sit just under the header, so HOLD / RESUME / RESET stay reachable while Settings is open
@@ -64,12 +67,14 @@ export function SettingsDrawer({ m, page, setPage, onClose, theme, setTheme, col
       <div className="settings-body" key={page}>
         {page === 'layout' && <LayoutSettings />}
         {page === 'units' && <UnitsPage />}
-        {page === 'appearance' && <AppearancePage theme={theme as 'dark' | 'light'} setTheme={setTheme} colors={colors} />}
+        {page === 'appearance' && <AppearancePage theme={theme as 'dark' | 'light'} setTheme={setTheme} colors={colors} density={density} setDensity={setDensity} />}
         {page === 'camera' && <CameraSetup m={m} onClose={onClose} onSaved={flash} onGoHa={() => setPage('homeassistant')} />}
         {page === 'homeassistant' && <HomeAssistantPage m={m} onSaved={flash} />}
         {page === 'spindle' && <SpindleSetup m={m} onClose={onClose} onSaved={flash} />}
         {page === 'controller' && <ControllerSettings m={m} />}
         {page === 'access' && <AccessSettings m={m} />}
+        {page === 'stats' && <StatsPage m={m} />}
+        {page === 'gamepad' && <GamepadPage pad={pad} />}
         {page === 'pcb' && <PcbSettings m={m} onSaved={flash} />}
       </div>
     </aside>
@@ -87,7 +92,7 @@ function UnitsPage() {
   );
 }
 
-function AppearancePage({ theme, setTheme, colors }: { theme: 'dark' | 'light'; setTheme: (t: 'dark' | 'light') => void; colors: Colors }) {
+function AppearancePage({ theme, setTheme, colors, density, setDensity }: { theme: 'dark' | 'light'; setTheme: (t: 'dark' | 'light') => void; colors: Colors; density: Density; setDensity: (d: Density) => void }) {
   const defaults = DEFAULTS[theme];
   const warn = problems(theme, colors.chosen);
   const hex = (k: ColorKey) => colors.chosen[k] ?? defaults[k];
@@ -104,6 +109,10 @@ function AppearancePage({ theme, setTheme, colors }: { theme: 'dark' | 'light'; 
       <div className="muted small">Light or dark, and the colours, for this browser only. The dark and the light theme each keep their own colours.</div>
       <label className="chk"><input type="radio" name="theme" checked={theme === 'dark'} onChange={() => setTheme('dark')} />Dark</label>
       <label className="chk"><input type="radio" name="theme" checked={theme === 'light'} onChange={() => setTheme('light')} />Light</label>
+
+      <div className="menu-h">Size of buttons and fields</div>
+      <label className="chk"><input type="radio" name="density" checked={density === 'comfortable'} onChange={() => setDensity('comfortable')} />Comfortable (larger, easier to hit on a touch screen)</label>
+      <label className="chk"><input type="radio" name="density" checked={density === 'compact'} onChange={() => setDensity('compact')} />Compact (smaller, more fits on screen)</label>
 
       <div className="menu-h">Accent colour</div>
       <div className="swatches" role="group" aria-label="Accent colour">

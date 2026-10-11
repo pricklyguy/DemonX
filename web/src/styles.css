@@ -162,7 +162,7 @@ table.ext tbody th { background: var(--panel2); color: var(--accent); text-align
 .camtest { display: flex; flex-direction: column; gap: 6px; padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
 .camtest img { max-width: 100%; max-height: 220px; object-fit: contain; border-radius: 4px; }
 @media (max-width: 720px) { .camform label { grid-template-columns: 1fr; } .cam-view { min-height: 40vh; } }
-.steprow select { flex: 1; min-width: 0; text-align: center; }
+.steprow select { flex: 0 1 8em; width: 8em; min-width: 0; text-align: center; }
 .steprow .btn { min-width: 48px; font-size: 1.2em; }
 .macros { display: flex; flex-direction: column; gap: 6px; }
 .macro-row { align-items: stretch; }

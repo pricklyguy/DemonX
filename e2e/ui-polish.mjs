@@ -24,6 +24,10 @@ await connect(p);
 const feed = p.locator('.panel[data-panel="jog"] input[type=number]').first();
 const w1 = await feed.evaluate((e) => e.getBoundingClientRect().width);
 ok(w1 > 40 && w1 < 140, `the jog feed field is sized for a few digits (${Math.round(w1)} px)`);
+await p.evaluate(() => { document.querySelector('.panel[data-panel="jog"]').style.width = '700px'; });
+const ws = await p.locator('.panel[data-panel="jog"] .steprow select').evaluateAll((l) => l.map((e) => e.getBoundingClientRect().width));
+ok(ws.length === 2 && ws.every((w) => w < 140), `the XY and Z step boxes stay narrow in a wide panel (${ws.map(Math.round).join(', ')} px)`);
+await p.evaluate(() => { document.querySelector('.panel[data-panel="jog"]').style.width = ''; });
 const jogH1 = await p.locator('.btn.jog').first().evaluate((e) => e.getBoundingClientRect().height);
 
 await p.getByRole('button', { name: '⚙ Settings' }).click();

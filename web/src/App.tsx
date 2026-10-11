@@ -6,6 +6,8 @@ import { PhoneDialog, ViewOnlyBar } from './Access';
 import { SettingsContext, useSettings, type SettingsPage } from './settingsContext';
 import { useColors, useDensity } from './appearance';
 import { useGamepad, type PadState } from './gamepad';
+import { useKeyboard } from './keyboard';
+import { jogGesture, stopAllJogging, useHoldJog } from './holdJog';
 import { CameraPanel } from './CameraPanel';
 import { MacrosPanel } from './MacrosPanel';
 import { SpindlePanel } from './SpindlePanel';
@@ -44,7 +46,9 @@ export function App() {
 
   const colors = useColors(theme);
   const [density, setDensity] = useDensity();
+  useHoldJog(m);
   const pad = useGamepad(m);
+  const keys = useKeyboard(m);
 
   const panels: Record<PanelId, React.ReactNode> = {
     connection: <ConnectPanel m={m} />,
@@ -69,7 +73,7 @@ export function App() {
         <ViewOnlyBar m={m} />
         <Dock panels={panels} />
         <ProbeDialog m={m} />
-        {settings && <SettingsDrawer m={m} page={settings.page} setPage={(page) => setSettings({ page })} onClose={() => setSettings(null)} theme={theme} setTheme={setTheme} colors={colors} density={density} setDensity={setDensity} pad={pad} />}
+        {settings && <SettingsDrawer m={m} page={settings.page} setPage={(page) => setSettings({ page })} onClose={() => setSettings(null)} theme={theme} setTheme={setTheme} colors={colors} density={density} setDensity={setDensity} pad={pad} keys={keys} />}
       </div>
     </SettingsContext.Provider></LayoutProvider></UnitsProvider>
   );
@@ -209,6 +213,22 @@ function JogBtn({ label, disabled, onJog, className = '' }: { label: string; dis
   return <button className={`btn jog ${className}`} disabled={disabled} onClick={onJog}>{label}</button>;
 }
 
+/**
+ * A jog button that you can tap (one step) or hold (keeps moving until you let go). The press is followed even if the finger or
+ * mouse slides off the button, and a cancelled touch lets go. Enter or Space on the focused button is a tap.
+ */
+function HoldBtn({ label, id, dir, disabled }: { label: string; id: string; dir: { x: number; y: number; z: number }; disabled: boolean }) {
+  return (
+    <button className="btn jog" disabled={disabled} aria-label={label}
+      onPointerDown={(e) => { if (e.pointerType === 'mouse' && e.button !== 0) return; try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* not capturable */ } jogGesture.down(id, dir); }}
+      onPointerUp={() => jogGesture.up(id)}
+      onPointerCancel={() => jogGesture.cancel(id)}
+      onLostPointerCapture={() => jogGesture.cancel(id)}
+      onContextMenu={(e) => e.preventDefault()}
+      onClick={(e) => { if (e.detail === 0) { jogGesture.down(id, dir); jogGesture.up(id); } }}>{label}</button>
+  );
+}
+
 /** The entry of a step list (in the unit on screen) closest to a step kept in mm */
 function nearestStep(list: number[], unit: 'mm' | 'in', mm: number): number {
   let best = 0;
@@ -250,20 +270,30 @@ function JogPanel({ m }: { m: Machine }) {
     if (Math.abs(lists.z[zi] * k - zStep) > 1e-9) setZStep(lists.z[zi] * k);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [u.unit]);
+  // the keyboard's "smaller / larger step" keys
+  useEffect(() => {
+    const on = (e: Event) => {
+      const dir = (e as CustomEvent<number>).detail;
+      const k = u.unit === 'in' ? MM_PER_INCH : 1;
+      const n = Math.max(0, Math.min(lists.xy.length - 1, nearestStep(lists.xy, u.unit, step) + dir));
+      setStep(lists.xy[n] * k);
+    };
+    window.addEventListener('demonx:jogstep', on);
+    return () => window.removeEventListener('demonx:jogstep', on);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [u.unit, step]);
   const off = !m.connection.connected || m.job.state === 'running';
-  const jog = (dx = 0, dy = 0) => () => m.send({ type: 'jog', dx: dx * step, dy: dy * step, feed });
-  const jogZ = (dir: number) => () => m.send({ type: 'jog', dz: dir * Math.min(zStep, MAX_Z_JOG), feed: zFeed });
   return (
     <Panel id="jog" title="Jog">
       <div className="jogwrap">
         <div className="pad">
-          <JogBtn label="↖" disabled={off} onJog={jog(-1, 1)} /><JogBtn label="Y+" disabled={off} onJog={jog(0, 1)} /><JogBtn label="↗" disabled={off} onJog={jog(1, 1)} />
-          <JogBtn label="X−" disabled={off} onJog={jog(-1, 0)} /><JogBtn label="■" className="stopjog" disabled={off} onJog={() => m.send({ type: 'jogCancel' })} /><JogBtn label="X+" disabled={off} onJog={jog(1, 0)} />
-          <JogBtn label="↙" disabled={off} onJog={jog(-1, -1)} /><JogBtn label="Y−" disabled={off} onJog={jog(0, -1)} /><JogBtn label="↘" disabled={off} onJog={jog(1, -1)} />
+          <HoldBtn label="↖" id="pad:nw" dir={{ x: -1, y: 1, z: 0 }} disabled={off} /><HoldBtn label="Y+" id="pad:n" dir={{ x: 0, y: 1, z: 0 }} disabled={off} /><HoldBtn label="↗" id="pad:ne" dir={{ x: 1, y: 1, z: 0 }} disabled={off} />
+          <HoldBtn label="X−" id="pad:w" dir={{ x: -1, y: 0, z: 0 }} disabled={off} /><JogBtn label="■" className="stopjog" disabled={off} onJog={() => { stopAllJogging(); m.send({ type: 'jogCancel' }); }} /><HoldBtn label="X+" id="pad:e" dir={{ x: 1, y: 0, z: 0 }} disabled={off} />
+          <HoldBtn label="↙" id="pad:sw" dir={{ x: -1, y: -1, z: 0 }} disabled={off} /><HoldBtn label="Y−" id="pad:s" dir={{ x: 0, y: -1, z: 0 }} disabled={off} /><HoldBtn label="↘" id="pad:se" dir={{ x: 1, y: -1, z: 0 }} disabled={off} />
         </div>
         <div className="zpad">
-          <JogBtn label="Z+" disabled={off} onJog={jogZ(1)} />
-          <JogBtn label="Z−" disabled={off} onJog={jogZ(-1)} />
+          <HoldBtn label="Z+" id="pad:zu" dir={{ x: 0, y: 0, z: 1 }} disabled={off} />
+          <HoldBtn label="Z−" id="pad:zd" dir={{ x: 0, y: 0, z: -1 }} disabled={off} />
         </div>
       </div>
       <StepPicker label="XY step" list={lists.xy} mm={step} onMm={setStep} />
@@ -276,7 +306,7 @@ function JogPanel({ m }: { m: Machine }) {
         <span className="muted lbl">Z feed</span>
         <NumInput mm={zFeed} onMm={(v) => v > 0 && setZFeed(v)} kind="feed" /> <span className="muted">{u.feedUnit}</span>
       </div>
-      <div className="muted small">Z jog is capped at {u.len(MAX_Z_JOG, 2)} {u.lenUnit} per press.</div>
+      <div className="muted small">Tap a button for one step; hold it to keep moving until you let go. Z moves at most {u.len(MAX_Z_JOG, 2)} {u.lenUnit} per tap or hold.</div>
     </Panel>
   );
 }

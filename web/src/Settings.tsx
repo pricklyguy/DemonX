@@ -11,6 +11,8 @@ import type { Colors, Density } from './appearance';
 import type { Machine } from './useMachine';
 import { StatsPage } from './Stats';
 import { GamepadPage } from './GamepadPage';
+import { KeyboardPage } from './KeyboardPage';
+import type { KeysState } from './keyboard';
 import type { PadState } from './gamepad';
 import type { SettingsPage } from './settingsContext';
 
@@ -19,13 +21,13 @@ import type { SettingsPage } from './settingsContext';
 
 const GROUPS: { title: string; hint: string; pages: { id: SettingsPage; label: string }[] }[] = [
   { title: 'This browser', hint: 'Only this browser: other computers and phones keep their own', pages: [
-    { id: 'layout', label: 'Layout' }, { id: 'units', label: 'Units' }, { id: 'appearance', label: 'Appearance' }, { id: 'gamepad', label: 'Gamepad' } ] },
+    { id: 'layout', label: 'Layout' }, { id: 'units', label: 'Units' }, { id: 'appearance', label: 'Appearance' }, { id: 'keyboard', label: 'Keyboard' }, { id: 'gamepad', label: 'Gamepad' } ] },
   { title: 'This machine', hint: 'Shared: every browser sees the same', pages: [
     { id: 'camera', label: 'Camera' }, { id: 'homeassistant', label: 'Home Assistant' }, { id: 'spindle', label: 'Spindle' }, { id: 'pcb', label: 'PCB mode' }, { id: 'controller', label: 'Controller' }, { id: 'stats', label: 'Stats & maintenance' }, { id: 'access', label: 'Access' } ] },
 ];
 
-export function SettingsDrawer({ m, page, setPage, onClose, theme, setTheme, colors, density, setDensity, pad }: {
-  m: Machine; pad: PadState; page: SettingsPage; setPage: (p: SettingsPage) => void; onClose: () => void; theme: string; setTheme: (t: 'dark' | 'light') => void; colors: Colors; density: Density; setDensity: (d: Density) => void;
+export function SettingsDrawer({ m, page, setPage, onClose, theme, setTheme, colors, density, setDensity, pad, keys }: {
+  m: Machine; pad: PadState; keys: KeysState; page: SettingsPage; setPage: (p: SettingsPage) => void; onClose: () => void; theme: string; setTheme: (t: 'dark' | 'light') => void; colors: Colors; density: Density; setDensity: (d: Density) => void;
 }) {
   const [saved, setSaved] = useState(false);
   // sit just under the header, so HOLD / RESUME / RESET stay reachable while Settings is open
@@ -74,6 +76,7 @@ export function SettingsDrawer({ m, page, setPage, onClose, theme, setTheme, col
         {page === 'controller' && <ControllerSettings m={m} />}
         {page === 'access' && <AccessSettings m={m} />}
         {page === 'stats' && <StatsPage m={m} />}
+        {page === 'keyboard' && <KeyboardPage keys={keys} />}
         {page === 'gamepad' && <GamepadPage pad={pad} />}
         {page === 'pcb' && <PcbSettings m={m} onSaved={flash} />}
       </div>

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PadSession, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN, type PadAction } from '../../shared/gamepad';
 import type { Machine } from './useMachine';
+import { holdBus, stopAllJogging } from './holdJog';
 
 // Reads a gamepad (the browser's Gamepad API) about ten times a second and sends hold-to-jog messages. What the sticks mean and
 // when they may move the machine is decided in shared/gamepad.ts; the server adds its own stops (server/src/jogHold.ts).
@@ -50,9 +51,9 @@ export function useGamepad(m: Machine): PadState {
     const run = (actions: PadAction[]) => {
       const { m: mm } = latest.current;
       for (const a of actions) {
-        if (a.type === 'hold') mm.send({ type: 'jogHold', x: a.x, y: a.y, z: a.z });
-        else if (a.type === 'release') mm.send({ type: 'jogRelease' });
-        else if (a.type === 'stop') { mm.send({ type: 'jogRelease' }); mm.send({ type: 'hold' }); }
+        if (a.type === 'hold') holdBus.set('pad', { x: a.x, y: a.y, z: a.z });
+        else if (a.type === 'release') holdBus.set('pad', null);
+        else if (a.type === 'stop') { stopAllJogging(); mm.send({ type: 'hold' }); }
         else update((s) => ({ ...s, speed: a.speed }));
       }
     };
@@ -92,7 +93,7 @@ export function useGamepad(m: Machine): PadState {
 
   // turning it off in Settings stops and disarms too
   useEffect(() => {
-    if (!saved.enabled) { for (const a of session.current.lost()) if (a.type === 'release') latest.current.m.send({ type: 'jogRelease' }); setArmed(false); }
+    if (!saved.enabled) { session.current.lost(); holdBus.set('pad', null); setArmed(false); }
   }, [saved.enabled]);
 
   return {

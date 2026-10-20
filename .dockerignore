@@ -1,0 +1,45 @@
+node_modules
+**/node_modules
+web/dist
+
+# Credentials and machine-local configuration (keep documented examples).
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+**/design.env
+**/.npmrc
+**/.netrc
+**/.ssh
+**/.aws
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+
+# Runtime data, logs, and local databases.
+**/data
+**/*.log
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+**/*.db-wal
+**/*.db-shm
+**/*.sqlite-wal
+**/*.sqlite-shm
+
+# Repository metadata and local export bookkeeping.
+**/.git
+.export-manifest.json
+
+# Local build and test output; the image builds its own CNC web assets.
+**/dist
+**/dist-next
+**/dist-prev
+**/dist-windows
+**/coverage
+**/.vite
+**/.cache
+**/playwright-report
+**/test-results
+**/*.tsbuildinfo

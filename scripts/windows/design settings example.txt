@@ -1,0 +1,18 @@
+Settings for DemonX Design on this computer.
+
+To use them: make a copy of this file named  design.env  (in this same folder, with no .txt on the end), change the lines
+you need, and start "Start DemonX Design.bat". Lines starting with # are ignored. Do not put quote marks around values.
+
+# The laser's network address, for a Ruida laser. Close LightBurn first: only one program can talk to the laser at a time.
+# (Ruida support has only been tried on one machine, so run the first jobs at low power, watching, with a hand on the stop.)
+DESIGN_RUIDA=1
+DESIGN_RUIDA_HOSTS=laser=192.168.1.50
+
+# The most power (percent) the server will accept in any job
+DESIGN_RUIDA_MAX_POWER=85
+
+# Let other computers on your network look at (and, with the PIN, control) the laser from this one. Without this line only this computer can.
+# DESIGN_HOST=0.0.0.0
+
+# USB (GRBL) lasers: only the ports named here are ever offered, so a CNC on USB can never be picked as a laser.
+# DESIGN_SERIAL_PORTS=COM5

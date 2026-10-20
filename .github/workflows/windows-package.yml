@@ -1,0 +1,60 @@
+name: Windows package
+
+# Builds DemonX-<version>-windows-x64.zip (DemonX, its own Node, start files, guide).
+# Run it by hand (Actions tab, "Run workflow") to get the zip as a download, or push a tag like v2.0.0-test1 to also
+# attach it to a GitHub release.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # a release is made from a tag: the version in package.json and the release notes must be on main BEFORE the tag is made
+      - name: The tag must match the version, and the release notes must exist
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          version="v$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_REF_NAME" != "$version" ]; then
+            echo "::error::The tag is $GITHUB_REF_NAME but package.json says $version. Bump the version (npm version <x.y.z> --workspaces --include-workspace-root --no-git-tag-version), merge it to main, then make the tag on that commit."
+            exit 1
+          fi
+          if [ ! -f "docs/releases/$GITHUB_REF_NAME.md" ]; then
+            echo "::error::docs/releases/$GITHUB_REF_NAME.md is missing: write the release notes and merge them before making the tag."
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm ci --prefix design
+      - run: npm run typecheck --prefix design
+      - run: npm test --prefix design
+      - run: node scripts/build-windows.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DemonX-windows-x64
+          path: |
+            dist-windows/DemonX-*-windows-x64.zip
+            dist-windows/DemonX-*-windows-x64.zip.sha256
+          if-no-files-found: error
+      - name: Attach to the release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          # the checksum is what Update now checks the zip against (server/src/updateWindows.ts): a release without it cannot be installed by it
+          files: |
+            dist-windows/DemonX-*-windows-x64.zip
+            dist-windows/DemonX-*-windows-x64.zip.sha256
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          body_path: docs/releases/${{ github.ref_name }}.md
+          fail_on_unmatched_files: true

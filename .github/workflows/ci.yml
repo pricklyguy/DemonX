@@ -1,0 +1,38 @@
+name: Checks
+
+# Typecheck, test and build DemonX CNC and DemonX Design on every pull request and every push to main.
+# DemonX Design imports code from server/ and shared/, so a change to the CNC side can break it without any CNC test failing;
+# this runs both. The browser checks in e2e/ and design/e2e/ need a running server and are not run here.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            design/package-lock.json
+      - run: npm ci
+      - run: npm ci --prefix design
+      - run: npm run typecheck:all
+      - run: npm run test:all
+      - name: Build DemonX CNC
+        run: npm run build
+      - name: Build DemonX Design
+        run: npm run build --prefix design

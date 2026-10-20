@@ -1,0 +1,12 @@
+node_modules/
+dist/
+dist-next/
+dist-prev/
+dist-windows/
+*.log
+.env
+design.env
+data/
+
+# Local export bookkeeping includes private development provenance.
+/.export-manifest.json

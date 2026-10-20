@@ -1,0 +1,81 @@
+/** Small line icons for the tool bar (24 x 24, drawn with the current text colour). */
+const P: Record<string, string> = {
+  select: 'M5 3l12 8-5.5 1.2L14 19l-2.6 1-2.6-6.8L5 17z',
+  rect: 'M4 6h16v12H4z',
+  circle: 'M12 4a8 8 0 100 16 8 8 0 000-16z',
+  line: 'M4 18l5-9 5 6 6-10',
+  ellipse: 'M12 6c5 0 9 2.7 9 6s-4 6-9 6-9-2.7-9-6 4-6 9-6z',
+  polygon: 'M12 3l8 6-3 10H7L4 9z',
+  star: 'M12 3l2.7 5.8 6.3.8-4.6 4.4 1.2 6.3L12 17.2 6.4 20.3l1.2-6.3L3 9.6l6.3-.8z',
+  arc: 'M5 19A14 14 0 0119 5',
+  text: 'M5 6V4h14v2M12 4v16M9 20h6',
+  textedit: 'M4 18l1-4 9-9 3 3-9 9zM13 6l3 3M4 21h16',
+  textlines: 'M5 6V4h14v2M12 4v16M9 20h6M4 12h2M18 12h2',
+  measure: 'M3 17L17 3l4 4L7 21zM7 13l2 2M10 10l2 2M13 7l2 2',
+  nodes: 'M12 3l9 9-9 9-9-9z M12 9.5v5 M9.5 12h5',
+  trim: 'M6 18a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM6 11a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 8l12 9M8 16L20 7',
+  join: 'M3 17l6-6M21 7l-6 6M9 11l6 2',
+  union: 'M4 4h10v6h6v10H10v-6H4z',
+  subtract: 'M4 4h10v6h6v10H10v-6H4zM14 10v4h-4',
+  intersect: 'M4 4h10v10H4zM10 10h10v10H10z',
+  group: '',
+  ungroup: '',
+  copy: 'M8 8h11v12H8zM5 16V4h11',
+  paste: 'M8 5h8v3H8zM6 6h-1v14h14v-1M10 12h8v8h-8z',
+  cut: 'M7 18a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM17 18a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 15L16 4M16 15L8 4',
+  duplicate: 'M4 4h10v10H4zM10 10h10v10H10z',
+  delete: 'M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13M10 11v6M14 11v6',
+  array: 'M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4z',
+  offset: 'M5 5h14v14H5zM9 9h6v6H9z',
+  corners: 'M4 20V10a6 6 0 016-6h10',
+  align: 'M4 4v16M8 7h12M8 13h8',
+  extend: 'M4 20L12 12M20 20L12 12M12 12l-3-3M12 12l3-3M4 4l5 5M20 4l-5 5',
+  fit: 'M3 17C7 5 11 5 12 12s5 7 9-5M3 17l1 1M12 12l1 1M21 7l1 1',
+  check: 'M5 12l4 4L19 6M4 4h16v16H4z',
+  boundary: 'M4 4h16v16H4zM8 9h8v7H8z',
+  move: 'M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3',
+  layers: 'M12 4l9 5-9 5-9-5zM3 14l9 5 9-5',
+  undo: 'M9 7L4 12l5 5M4 12h10a6 6 0 010 12',
+  'job-laser': 'M9 3h6v5l-1.5 2h-3L9 8zM12 12v3M7 14l2 2M17 14l-2 2M5 19h14',
+  'job-cnc': 'M9 3h6v5l-1.5 2h-3L9 8zM12 10v6M8 17l1 1M16 17l-1 1M4 21h16',
+  'job-canvas': 'M5 4h14v16H5zM8 16l3-4 2 3 2-2 2 3',
+  plus: 'M12 5v14M5 12h14',
+  chevron: 'M9 6l6 6-6 6',
+  chevdown: 'M6 9l6 6 6-6',
+  back: 'M15 6l-6 6 6 6',
+  settings: 'M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z',
+  new: 'M6 3h8l4 4v14H6zM14 3v4h4',
+  open: 'M3 7h6l2 2h10v10H3zM3 11h18',
+  save: 'M5 4h12l3 3v13H5zM8 4v5h8V4M8 20v-6h8v6',
+  import: 'M12 3v11M7 10l5 5 5-5M4 20h16',
+  bitmap: 'M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4M15 9h.01',
+  close: 'M6 6l12 12M18 6L6 18',
+  'pv-all': 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 15a3 3 0 100-6 3 3 0 000 6z',
+  'pv-sel': 'M4 4h10v10H4zM12 12l8 4-3.500 1.200L15 21z',
+  'pv-reset': 'M4 12a8 8 0 108-8M4 4v5h5',
+  'pv-save': 'M4 8h4l2-3h4l2 3h4v11H4zM12 16a3 3 0 100-6 3 3 0 000 6z',
+  'pv-play': 'M7 4l13 8-13 8z',
+  'pv-pause': 'M7 4h3v16H7zM14 4h3v16h-3z',
+  'tp-profile': 'M7 7h10v10H7zM3 3h18v18H3z',
+  'tp-pocket': 'M4 4h16v16H4zM8 8h8v8H8zM11 11h2v2h-2z',
+  'tp-drill': 'M12 3v9M9 9l3 3 3-3M5 17h14M8 20h8',
+  'tp-engrave': 'M4 20l1-4L16 5l3 3L8 19zM14 7l3 3M4 20l4-1',
+  'tp-inlay': 'M4 4h16v16H4zM8 12l4-4 4 4-4 4z',
+  'tp-vcarve': 'M3 5h18M5 5l7 14 7-14M9.5 5L12 11l2.5-6',
+  'tp-photo': 'M4 5h16v14H4zM8 9h.01M12 9h.01M16 9h.01M8 12h.01M12 12h.01M16 12h.01M8 15h.01M12 15h.01M16 15h.01',
+  'tp-rough3d': 'M12 3l8 4v10l-8 4-8-4V7zM4 7l8 4 8-4M12 11v10',
+  'tp-finish3d': 'M12 4a8 8 0 100 16 8 8 0 000-16zM4.5 14c2 1.3 4.600 2 7.500 2s5.500-.7 7.500-2M4.5 10c2 -1.3 4.600-2 7.500-2s5.500.7 7.500 2M12 4c-2.500 2.200-3.500 5-3.500 8s1 5.800 3.500 8',
+  'tp-library': 'M5 4h4v16H5zM11 4h4v16h-4zM17.500 5l3 .8-3.500 14.500-3-.8z',
+};
+
+/** Parts of an icon drawn solid (the dots of the group icons) */
+const FILLED: Record<string, string> = { group: 'M9.8 12a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0 -4.4 0zM10.3 1.8a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0zM12 8L13.8 4.2L10.2 4.2zM19.13 6.9a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0zM15.46 10L19.65 9.66L17.85 6.54zM19.13 17.1a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0zM15.46 14L17.85 17.46L19.65 14.34zM10.3 22.2a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0zM12 16L10.2 19.8L13.8 19.8zM1.47 17.1a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0zM8.54 14L4.35 14.34L6.15 17.46zM1.47 6.9a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0zM8.54 10L6.15 6.54L4.35 9.66z', ungroup: 'M9.8 12a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0 -4.4 0zM10.3 1.8a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0zM12 3.8L13.8 7.6L10.2 7.6zM19.13 6.9a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0zM19.1 7.9L16.71 11.36L14.91 8.24zM19.13 17.1a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0zM19.1 16.1L14.91 15.76L16.71 12.64zM10.3 22.2a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0zM12 20.2L10.2 16.4L13.8 16.4zM1.47 17.1a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0zM4.9 16.1L7.29 12.64L9.09 15.76zM1.47 6.9a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0zM4.9 7.9L9.09 8.24L7.29 11.36z' };
+
+export function Icon({ name, size = 18 }: { name: keyof typeof P | string; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={P[name] ?? ''} />
+      {FILLED[name] && <path d={FILLED[name]} fill="currentColor" stroke="none" />}
+    </svg>
+  );
+}

@@ -1,3 +1,35 @@
+# credentials and environment files (the documented example stays)
+.env
+.env.*
+design.env
+!design/design.env.example
+*.pem
+*.key
+
+# runtime data and databases
+data
+**/data
+*.sqlite
+*.sqlite3
+*.db
+
+# logs
+*.log
+npm-debug.log*
+
+# Git metadata and the export manifest
+.git
+.export-manifest.json
+
+# dependencies and generated build or test output
 node_modules
 **/node_modules
-web/dist
+dist
+**/dist
+dist-next
+dist-prev
+dist-windows
+coverage
+**/coverage
+test-results
+playwright-report

@@ -233,7 +233,6 @@ describe('isLocalRequest', () => {
 });
 
 const nic = (address: string, over: Record<string, unknown> = {}) => ({ address, family: address.includes(':') ? 'IPv6' : 'IPv4', internal: false, netmask: '', mac: '', cidr: null, ...over });
-// Synthetic private IPv4 and documentation IPv6 addresses preserve LAN/subnet coverage.
 const NETS = {
   lo: [nic('127.0.0.1', { internal: true, cidr: '127.0.0.1/8' })],
   eth0: [nic('10.0.100.43', { cidr: '10.0.100.43/24' }), nic('2001:db8:1:2::43', { cidr: '2001:db8:1:2::43/64' })],

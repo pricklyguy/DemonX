@@ -1,9 +1,32 @@
+# dependencies and generated build or test output
 node_modules/
 dist/
 dist-next/
 dist-prev/
 dist-windows/
-*.log
-.env
-design.env
+coverage/
+test-results/
+playwright-report/
+
+# runtime data, settings and credentials (design.env.example stays: it is the documented example)
 data/
+.env
+.env.*
+design.env
+*.pem
+*.key
+
+# logs, databases, network captures
+*.log
+*.sqlite
+*.sqlite3
+*.db
+*.pcap
+*.pcapng
+
+# the export script keeps its own bookkeeping here: it must never be committed
+/.export-manifest.json
+
+# operating system files
+.DS_Store
+Thumbs.db

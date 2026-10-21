@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { ACCENT_PRESETS, COLOR_KEYS, DEFAULTS, LABELS, type ColorKey } from '../../../shared/colors';
+import { ACCENT_PRESETS, CANVAS_DEFAULTS, COLOR_KEYS, DEFAULTS, LABELS, type ColorKey } from '../../../shared/colors';
 import type { Colors } from './appearance';
 import { useHideNotes } from './prefs';
 
@@ -35,8 +35,8 @@ export function AppearanceDialog({ theme, setTheme, colors, onClose }: { theme: 
         </div>
         <label className="color-row">
           <span>Drawing area (the grid)</span>
-          <input type="color" aria-label="Drawing area" value={colors.canvas ?? (theme === 'dark' ? '#14130f' : '#f4efe0')} onChange={(e) => colors.setCanvas(e.target.value)} />
-          <code>{colors.canvas ?? (theme === 'dark' ? '#14130f' : '#f4efe0')}</code>
+          <input type="color" aria-label="Drawing area" value={colors.canvas ?? CANVAS_DEFAULTS[theme]} onChange={(e) => colors.setCanvas(e.target.value)} />
+          <code>{colors.canvas ?? CANVAS_DEFAULTS[theme]}</code>
           <button type="button" className="btn small" disabled={!colors.canvas} onClick={() => colors.setCanvas(undefined)}>Reset</button>
         </label>
         <div className="color-rows">

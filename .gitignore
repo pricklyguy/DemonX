@@ -7,6 +7,3 @@ dist-windows/
 .env
 design.env
 data/
-
-# Local export bookkeeping includes private development provenance.
-/.export-manifest.json

@@ -28,12 +28,12 @@ await drawer.getByLabel('Dark', { exact: true }).check();
 // colours: accent presets, custom colours, readability warnings, per-theme, saved, reset
 const cssVar = (n) => p.evaluate((v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim(), n);
 await drawer.getByRole('button', { name: 'Appearance', exact: true }).click();
-check('built-in dark accent to start', (await cssVar('--accent')) === '#6aa84f');
+check('built-in dark accent to start', (await cssVar('--accent')) === '#1cb8cc');
 await drawer.getByRole('button', { name: 'Blue' }).click();
 check('the Blue accent applies to the whole page, with readable button text', (await cssVar('--accent')) === '#4f8fe0' && (await cssVar('--accent-text')) === '#0e0e0e', `${await cssVar('--accent')} ${await cssVar('--accent-text')}`);
 check('the chosen swatch is marked', (await drawer.getByRole('button', { name: 'Blue' }).getAttribute('aria-pressed')) === 'true');
 await drawer.getByLabel('Light', { exact: true }).check(); await p.waitForTimeout(200);
-check('the light theme keeps its own colours (still the built-in green)', (await cssVar('--accent')) === '#3f7d2c', await cssVar('--accent'));
+check('the light theme keeps its own colours (still the built-in teal)', (await cssVar('--accent')) === '#0b8396', await cssVar('--accent'));
 await drawer.getByRole('button', { name: 'Orange' }).click();
 check('...and gets its own orange, tuned for light', (await cssVar('--accent')) === '#b85d14', await cssVar('--accent'));
 await drawer.getByLabel('Dark', { exact: true }).check(); await p.waitForTimeout(200);
@@ -44,16 +44,16 @@ check('the colours are kept for this browser after a reload', (await cssVar('--a
 await p.getByRole('button', { name: /Settings/ }).click();
 await drawer.getByRole('button', { name: 'Appearance', exact: true }).click();
 await drawer.getByText('Choose each colour').click();
-await drawer.getByLabel('Text', { exact: true }).fill('#1e1d17');       // the panel colour: unreadable
+await drawer.getByLabel('Text', { exact: true }).fill('#20292e');       // the panel colour: unreadable
 await p.waitForTimeout(200);
 check('text the same as the panel is flagged as hard to read', /text is hard to read/.test(await drawer.innerText()));
 await drawer.getByLabel('Text', { exact: true }).fill('#ffffff');
 await drawer.getByLabel('Panels', { exact: true }).fill('#102030');
 await p.waitForTimeout(200);
-check('a custom panel colour brings matching in-between colours', (await cssVar('--panel')) === '#102030' && /^#[0-9a-f]{6}$/.test(await cssVar('--panel2')) && (await cssVar('--panel2')) !== '#27261e', `${await cssVar('--panel')} ${await cssVar('--panel2')}`);
+check('a custom panel colour brings matching in-between colours', (await cssVar('--panel')) === '#102030' && /^#[0-9a-f]{6}$/.test(await cssVar('--panel2')) && (await cssVar('--panel2')) !== '#2e373c', `${await cssVar('--panel')} ${await cssVar('--panel2')}`);
 check('and the warning is gone', !/hard to read/.test(await drawer.innerText()));
 await drawer.getByRole('button', { name: 'Reset to the built-in colours' }).click(); await p.waitForTimeout(200);
-check('Reset puts the built-in dark colours back', (await cssVar('--accent')) === '#6aa84f' && (await cssVar('--panel')) === '#1e1d17', `${await cssVar('--accent')} ${await cssVar('--panel')}`);
+check('Reset puts the built-in dark colours back', (await cssVar('--accent')) === '#1cb8cc' && (await cssVar('--panel')) === '#20292e', `${await cssVar('--accent')} ${await cssVar('--panel')}`);
 await drawer.getByRole('button', { name: 'Home Assistant', exact: true }).click();
 check('Home Assistant page has address, token and certificate fields', await drawer.getByPlaceholder('http://homeassistant.local:8123').count() === 1 && await drawer.locator('input[type=password]').count() >= 1);
 await drawer.getByPlaceholder('http://homeassistant.local:8123').fill('not a url');

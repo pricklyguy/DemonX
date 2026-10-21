@@ -1,13 +1,13 @@
 /* Same palette and panel look as the DemonX controller, so the family feels like one product. */
 :root {
-  --bg: #14130f; --panel: #1e1d17; --panel2: #27261e; --line: #38362a; --text: #ece8d8; --muted: #9a9680;
-  --canvas: #14130f;
-  --accent: #6aa84f; --accent-text: #0e1a08; --amber: #e0a030; --cyan: #2bb5c9; --danger: #d8503c; --ok: #4caf7a;
+  --bg: #171e22; --panel: #20292e; --panel2: #2e373c; --line: #414a4f; --text: #e4ecef; --muted: #9aa2a6;
+  --canvas: #0f1519;
+  --accent: #1cb8cc; --accent-text: #0e0e0e; --amber: #e8873a; --cyan: #4a9fe0; --danger: #e0503c; --ok: #3fbf7f;
 }
 :root[data-theme='light'] {
-  --bg: #f4efe0; --panel: #fffdf6; --panel2: #efe8d2; --line: #d5cba8; --text: #26230f; --muted: #6d684c;
-  --canvas: #f4efe0;
-  --accent: #3f7d2c; --accent-text: #ffffff; --amber: #b87a10; --cyan: #0e8ea3; --danger: #c0392b; --ok: #2e8b57;
+  --bg: #e3eaee; --panel: #f0f4f6; --panel2: #e1e5e8; --line: #cbd0d3; --text: #17232a; --muted: #697278;
+  --canvas: #eef3f5;
+  --accent: #0b8396; --accent-text: #ffffff; --amber: #c4621f; --cyan: #2a72b8; --danger: #c0392b; --ok: #23895a;
 }
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; }
@@ -191,7 +191,7 @@ details .log { max-height: 160px; overflow-y: auto; background: var(--bg); borde
 /* one tab style for the page tabs and the side tabs: the selected one is filled with the accent colour */
 .maintab { background: var(--bg); color: var(--muted); border: 1px solid var(--line); border-bottom: 0; border-radius: 8px 8px 0 0; padding: 7px 24px; font: inherit; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-size: 13px; cursor: pointer; }
 .maintab:hover { color: var(--text); }
-.maintab.on { background: var(--accent); border-color: var(--accent); color: #0b1a14; }
+.maintab.on { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
 .tools { gap: 8px; overflow-y: auto; position: relative; }
 .tgroup { display: grid; grid-template-columns: repeat(4, 34px); gap: 4px; justify-content: center; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
 .tgroup h4 { grid-column: 1 / -1; margin: 2px 0 0; font-size: 11px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); }
@@ -316,7 +316,7 @@ details .log { max-height: 160px; overflow-y: auto; background: var(--bg); borde
 .sidetabs { display: flex; flex-direction: column; gap: 4px; padding: 6px 0 6px 0; background: var(--panel); border-left: 1px solid var(--line); }
 .vtab { writing-mode: vertical-rl; background: var(--bg); color: var(--muted); border: 1px solid var(--line); border-right: 0; border-radius: 8px 0 0 8px; padding: 12px 6px; font: inherit; font-weight: 700; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
 .vtab:hover { color: var(--text); }
-.vtab.on { background: var(--accent); border-color: var(--accent); color: #0b1a14; }
+.vtab.on { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
 
 /* camera */
 .camera-pic img { width: 100%; border-radius: 4px; display: block; background: #000; }

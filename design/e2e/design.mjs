@@ -902,7 +902,7 @@ const darkPx = await pixel();
 await page.getByRole('button', { name: /☀|☾/ }).click();
 await page.waitForTimeout(150);
 const lightPx = await pixel();
-check(darkPx !== lightPx && lightPx === 'f4efe0', 'switching dark to light repaints the drawing area straight away (no click needed): ' + darkPx + ' to ' + lightPx);
+check(darkPx !== lightPx && lightPx === 'eef3f5', 'switching dark to light repaints the drawing area straight away (no click needed): ' + darkPx + ' to ' + lightPx);
 await page.getByRole('button', { name: /^Settings/ }).click();
 await page.getByRole('menuitem', { name: /^Appearance/ }).click();
 await page.getByRole('dialog', { name: 'Appearance' }).getByLabel('Drawing area').fill('#223344');

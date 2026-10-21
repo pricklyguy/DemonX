@@ -11,9 +11,12 @@ export type Overrides = Partial<Record<ColorKey, string>>;
 
 /** The built-in colours (kept in step with styles.css) */
 export const DEFAULTS: Record<Mode, Record<ColorKey, string>> = {
-  dark: { accent: '#6aa84f', bg: '#14130f', panel: '#1e1d17', text: '#ece8d8', amber: '#e0a030', cyan: '#2bb5c9', danger: '#d8503c', ok: '#4caf7a' },
-  light: { accent: '#3f7d2c', bg: '#f4efe0', panel: '#fffdf6', text: '#26230f', amber: '#b87a10', cyan: '#0e8ea3', danger: '#c0392b', ok: '#2e8b57' },
+  dark: { accent: '#1cb8cc', bg: '#171e22', panel: '#20292e', text: '#e4ecef', amber: '#e8873a', cyan: '#4a9fe0', danger: '#e0503c', ok: '#3fbf7f' },
+  light: { accent: '#0b8396', bg: '#e3eaee', panel: '#f0f4f6', text: '#17232a', amber: '#c4621f', cyan: '#2a72b8', danger: '#c0392b', ok: '#23895a' },
 };
+
+/** The built-in colour of the drawing area in DemonX Design (the grid), apart from the page background */
+export const CANVAS_DEFAULTS: Record<Mode, string> = { dark: '#0f1519', light: '#eef3f5' };
 
 export const LABELS: Record<ColorKey, string> = {
   accent: 'Accent (buttons, highlights)', bg: 'Page background', panel: 'Panels', text: 'Text',
@@ -22,9 +25,9 @@ export const LABELS: Record<ColorKey, string> = {
 
 /** Accent presets, each with a version that reads well on dark and on light */
 export const ACCENT_PRESETS: { name: string; dark: string; light: string }[] = [
+  { name: 'Teal', dark: '#1cb8cc', light: '#0b8396' },
   { name: 'Green', dark: '#6aa84f', light: '#3f7d2c' },
   { name: 'Blue', dark: '#4f8fe0', light: '#2a66b8' },
-  { name: 'Teal', dark: '#2bb5a0', light: '#0e8a78' },
   { name: 'Orange', dark: '#e8883a', light: '#b85d14' },
   { name: 'Gold', dark: '#d6b13a', light: '#9a7a10' },
   { name: 'Red', dark: '#e0605a', light: '#b3342d' },

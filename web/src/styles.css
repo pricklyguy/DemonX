@@ -1,10 +1,10 @@
 :root {
-  --bg: #14130f; --panel: #1e1d17; --panel2: #27261e; --line: #38362a; --text: #ece8d8; --muted: #9a9680;
-  --accent: #6aa84f; --accent-text: #0e1a08; --amber: #e0a030; --cyan: #2bb5c9; --danger: #d8503c; --ok: #4caf7a;
+  --bg: #171e22; --panel: #20292e; --panel2: #2e373c; --line: #414a4f; --text: #e4ecef; --muted: #9aa2a6;
+  --accent: #1cb8cc; --accent-text: #0e0e0e; --amber: #e8873a; --cyan: #4a9fe0; --danger: #e0503c; --ok: #3fbf7f;
 }
 :root[data-theme='light'] {
-  --bg: #f4efe0; --panel: #fffdf6; --panel2: #efe8d2; --line: #d5cba8; --text: #26230f; --muted: #6d684c;
-  --accent: #3f7d2c; --accent-text: #ffffff; --amber: #b87a10; --cyan: #0e8ea3; --danger: #c0392b; --ok: #2e8b57;
+  --bg: #e3eaee; --panel: #f0f4f6; --panel2: #e1e5e8; --line: #cbd0d3; --text: #17232a; --muted: #697278;
+  --accent: #0b8396; --accent-text: #ffffff; --amber: #c4621f; --cyan: #2a72b8; --danger: #c0392b; --ok: #23895a;
 }
 * { box-sizing: border-box; }
 /* On a touchscreen a sideways swipe or a pull-down must not navigate away or reload the page mid-job */
@@ -39,9 +39,9 @@ input:not([type=file]) { flex: 1; }
 .btn.small { padding: 3px 8px; font-size: 12px; }
 .btn.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
 .btn.ok { background: var(--ok); color: #fff; border-color: var(--ok); }
-.btn.warn { background: var(--amber); color: #201400; border-color: var(--amber); }
+.btn.warn { background: var(--amber); color: #10171a; border-color: var(--amber); }
 .btn.danger { background: var(--danger); color: #fff; border-color: var(--danger); }
-.btn.home { background: var(--cyan); color: #03222a; border-color: var(--cyan); }
+.btn.home { background: var(--cyan); color: #0a1620; border-color: var(--cyan); }
 :root[data-theme='light'] .btn.home { color: #fff; }
 .btn.ghost { background: transparent; }
 /* one grid for all three axes, so the columns line up whatever each number's width (rows are transparent to the grid) */
@@ -140,8 +140,8 @@ table.ext tbody th { background: var(--panel2); color: var(--accent); text-align
 
 /* A slow pulse on Home after connecting, until Home or Unlock is pressed */
 @keyframes homePulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(43, 181, 201, 0); filter: brightness(1); }
-  50% { box-shadow: 0 0 0 5px rgba(43, 181, 201, .35), 0 0 16px rgba(43, 181, 201, .65); filter: brightness(1.18); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(74, 159, 224, 0); filter: brightness(1); }
+  50% { box-shadow: 0 0 0 5px rgba(74, 159, 224, .35), 0 0 16px rgba(74, 159, 224, .65); filter: brightness(1.18); }
 }
 .btn.home.pulse { animation: homePulse 2.4s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .btn.home.pulse { animation: none; outline: 3px solid var(--cyan); outline-offset: 2px; } }
@@ -214,7 +214,7 @@ table.ext tbody th { background: var(--panel2); color: var(--accent); text-align
 
 /* ---- PCB mode ---- */
 .pcbp { display: flex; flex-direction: column; gap: 8px; }
-.pcb-on { background: var(--amber); color: #201400; font-weight: 800; letter-spacing: .5px; padding: 6px 10px; border-radius: 6px; }
+.pcb-on { background: var(--amber); color: #10171a; font-weight: 800; letter-spacing: .5px; padding: 6px 10px; border-radius: 6px; }
 .btn.pcb-home { border: 3px solid var(--amber); background: color-mix(in srgb, var(--amber) 18%, var(--panel2)); font-size: 1.1em; padding: 10px 12px; }
 .btn.pcb-home:disabled { border-color: var(--line); background: var(--panel2); }
 .pcb-steps { display: flex; flex-direction: column; gap: 6px; }
@@ -252,7 +252,7 @@ table.ext tbody th { background: var(--panel2); color: var(--accent); text-align
 .maint { flex-wrap: wrap; border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; background: var(--bg); }
 .maint.due { border-color: var(--amber); }
 .maint-text { flex: 1 1 180px; display: flex; flex-direction: column; min-width: 0; }
-.duepill { background: var(--amber); color: #201400; border-radius: 10px; padding: 1px 8px; font-size: 12px; font-weight: 700; margin-left: 8px; white-space: nowrap; }
+.duepill { background: var(--amber); color: #10171a; border-radius: 10px; padding: 1px 8px; font-size: 12px; font-weight: 700; margin-left: 8px; white-space: nowrap; }
 .maint .duepill { margin-left: 0; }
 .statlist td { padding: 3px 8px 3px 0; }
 .statlist .runname { text-align: left; max-width: 14em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

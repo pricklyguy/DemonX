@@ -1,6 +1,6 @@
 {
   "name": "demonx",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "private": true,
   "license": "GPL-3.0-or-later",
   "description": "DemonX CNC controller: server-owned GRBL connection, browser UI for any device on the network",

@@ -32,7 +32,7 @@ cd demonx
 ```
 The script installs Node.js, the packages and the web page, gives your user serial-port access, and sets DemonX to start at every boot. It takes several minutes on a Pi. When it finishes it prints the address. Reboot once when it says so (`sudo reboot`).
 
-To install a specific release instead of the newest code, add its tag: `git clone --branch v2.2.1 https://github.com/pricklyguy/DemonX.git demonx` (the tags are on the Releases page).
+To install a specific release instead of the newest code, add its tag: `git clone --branch v2.2.2 https://github.com/pricklyguy/DemonX.git demonx` (the tags are on the Releases page).
 
 If the repository is private, GitHub will ask for credentials: use a personal access token as the password.
 
